@@ -1,0 +1,42 @@
+{
+  "workflow_id": "wf_demo_mrv",
+  "metadata": {
+    "name": "VM0048 Verification Swarm",
+    "owner": "0xUserWallet"
+  },
+  "nodes": [
+    {
+      "id": "node_trigger",
+      "type": "trigger",
+      "parameters": {
+        "mock_payload": "{ \"carbon_data\": 150, \"methodology\": \"VM0048\", \"region\": \"Southeast_Asia\" }"
+      }
+    },
+    {
+      "id": "node_compute",
+      "type": "0g_inference",
+      "parameters": {
+        "model_id": "qwen-2.5-7b-instruct",
+        "system_prompt": "You are a carbon methodology validator. Analyze the provided environmental data and validate it against VM0048 methodology standards. Return a JSON object with validation_passed (boolean), reasoning (string), and calculations (object).",
+        "input_ref": "{{node_trigger.output}}"
+      }
+    },
+    {
+      "id": "node_storage",
+      "type": "0g_storage_write",
+      "parameters": {
+        "value_ref": "{{node_compute.output.reasoning}}"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "node_trigger",
+      "target": "node_compute"
+    },
+    {
+      "source": "node_compute",
+      "target": "node_storage"
+    }
+  ]
+}
