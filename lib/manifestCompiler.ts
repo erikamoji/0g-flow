@@ -3,7 +3,7 @@ import { Node, Edge } from 'reactflow';
 export interface ManifestNode {
   id: string;
   type: string;
-  parameters: Record<string, any>;
+  params: Record<string, any>;
 }
 
 export interface ManifestEdge {
@@ -13,10 +13,7 @@ export interface ManifestEdge {
 
 export interface Manifest {
   workflow_id: string;
-  metadata: {
-    name: string;
-    owner: string;
-  };
+  owner: string;
   nodes: ManifestNode[];
   edges: ManifestEdge[];
 }
@@ -24,32 +21,38 @@ export interface Manifest {
 export function compileManifest(
   nodes: Node[],
   edges: Edge[],
-  workflowName: string = 'VM0048 Verification Swarm',
-  owner: string = '0xUserWallet'
+  owner: string = '0x0'
 ): Manifest {
   const manifestNodes: ManifestNode[] = nodes.map((node) => {
     const baseParams: Record<string, any> = {};
 
-    if (node.type === 'trigger') {
-      baseParams.mock_payload = '{ "carbon_data": 150 }';
-    } else if (node.type === '0g_inference') {
-      baseParams.model_id = 'qwen-2.5-7b-instruct';
-      baseParams.system_prompt = 'Run methodology validation...';
-      const triggerNode = nodes.find((n) => n.type === 'trigger');
-      if (triggerNode) {
-        baseParams.input_ref = `{{${triggerNode.id}.output.mock_payload}}`;
+    if (node.type === 'data_input') {
+      baseParams.raw_json = '{"request_id": "1001", "content": "Sample data"}';
+    } else if (node.type === 'ai_compute') {
+      baseParams.model = 'qwen-2.5-7b-instruct';
+      baseParams.instruction = 'Analyze the input data and provide a structured summary.';
+      baseParams.verifiable_execution = false;
+
+      // Find the input node that feeds into this one
+      const inputEdge = edges.find((e) => e.target === node.id);
+      if (inputEdge) {
+        baseParams.data_source = `{{${inputEdge.source}.output}}`;
       }
-    } else if (node.type === '0g_storage_write') {
-      const inferenceNode = nodes.find((n) => n.type === '0g_inference');
-      if (inferenceNode) {
-        baseParams.value_ref = `{{${inferenceNode.id}.output.reasoning}}`;
+    } else if (node.type === 'storage_anchor') {
+      baseParams.key = 'agent_state_log';
+      baseParams.persistence_level = 'Standard';
+
+      // Find the logic node that feeds into this one
+      const logicEdge = edges.find((e) => e.target === node.id);
+      if (logicEdge) {
+        baseParams.payload = `{{${logicEdge.source}.output}}`;
       }
     }
 
     return {
       id: node.id,
       type: node.type || 'unknown',
-      parameters: baseParams,
+      params: baseParams,
     };
   });
 
@@ -59,11 +62,8 @@ export function compileManifest(
   }));
 
   return {
-    workflow_id: `wf_${Date.now()}`,
-    metadata: {
-      name: workflowName,
-      owner: owner,
-    },
+    workflow_id: `agnostic_workflow_${Date.now()}`,
+    owner: owner,
     nodes: manifestNodes,
     edges: manifestEdges,
   };

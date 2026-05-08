@@ -58,7 +58,7 @@ function Dashboard() {
       return;
     }
 
-    const compiled = compileManifest(nodes, edges, 'VM0048 Verification Swarm', address || '0x0');
+    const compiled = compileManifest(nodes, edges, address || '0x0');
     setManifest(compiled);
     setIsModalOpen(true);
   }, [nodes, edges, address]);

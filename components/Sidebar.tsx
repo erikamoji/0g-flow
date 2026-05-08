@@ -32,9 +32,9 @@ export function Sidebar() {
                 className="p-3 bg-gray-800 rounded-lg cursor-move hover:bg-gray-700 transition-colors border-l-4"
                 style={{
                   borderLeftColor: {
-                    trigger: '#3b82f6',
-                    '0g_inference': '#f59e0b',
-                    '0g_storage_write': '#10b981',
+                    data_input: '#60a5fa',
+                    ai_compute: '#a78bfa',
+                    storage_anchor: '#34d399',
                   }[key],
                 }}
               >
@@ -51,11 +51,12 @@ export function Sidebar() {
       </div>
 
       <div className="border-t border-gray-700 pt-6 mt-6">
-        <h3 className="text-sm font-semibold mb-3 text-gray-300">Info</h3>
-        <p className="text-xs text-gray-500 leading-relaxed">
-          Create a decentralized workflow by connecting trigger, inference, and
-          storage nodes. Click "Deploy" to compile to JSON manifest.
-        </p>
+        <h3 className="text-sm font-semibold mb-3 text-gray-300">How It Works</h3>
+        <ol className="text-xs text-gray-500 leading-relaxed space-y-2">
+          <li>1. <strong>Input</strong> – Define your data source</li>
+          <li>2. <strong>Logic</strong> – Process with 0G AI compute</li>
+          <li>3. <strong>Anchor</strong> – Persist to decentralized storage</li>
+        </ol>
       </div>
     </div>
   );

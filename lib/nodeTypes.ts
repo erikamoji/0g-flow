@@ -1,19 +1,22 @@
-export type NodeType = 'trigger' | '0g_inference' | '0g_storage_write';
+export type NodeType = 'data_input' | 'ai_compute' | 'storage_anchor';
 
 export const NODE_TYPES = {
-  trigger: {
-    label: 'Trigger',
-    description: 'Starting point - mock data payload',
-    icon: '▶',
+  data_input: {
+    label: 'Input',
+    description: 'Define initial data source',
+    icon: '📥',
+    color: 'border-blue-400',
   },
-  '0g_inference': {
-    label: '0G Inference',
-    description: 'AI model inference via 0G compute',
-    icon: '⚡',
+  ai_compute: {
+    label: 'Logic',
+    description: 'AI model computation via 0G',
+    icon: '🧠',
+    color: 'border-violet-500',
   },
-  '0g_storage_write': {
-    label: '0G Storage',
-    description: 'Anchor to 0G decentralized storage',
-    icon: '💾',
+  storage_anchor: {
+    label: 'Anchor',
+    description: 'Persist output to 0G storage',
+    icon: '📌',
+    color: 'border-emerald-400',
   },
 };

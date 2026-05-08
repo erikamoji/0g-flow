@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Manifest } from './manifestCompiler';
 import { ExecutionLogger } from './executionLogger';
-import { resolveParametersObject, StateStore } from './variableResolver';
+import { resolveParametersObject } from './variableResolver';
 
 export interface ExecutionContext {
   [nodeId: string]: any;
@@ -16,7 +16,6 @@ export interface ExecutionResult {
 }
 
 const OG_ROUTER_API = 'https://router-api.0g.ai/v1';
-const OG_RPC_URL = 'https://test-rpc.0g.ai';
 
 class ManifestExecutor {
   private manifest: Manifest;
@@ -62,15 +61,15 @@ class ManifestExecutor {
     return order;
   }
 
-  private async executeTriggerNode(nodeId: string): Promise<any> {
+  private async executeDataInputNode(nodeId: string): Promise<any> {
     const node = this.manifest.nodes.find((n) => n.id === nodeId);
     if (!node) throw new Error(`Node ${nodeId} not found`);
 
-    this.logger.nodeStart(nodeId, node.type, node.parameters);
+    this.logger.nodeStart(nodeId, node.type, node.params);
 
     try {
-      const mockPayload = node.parameters.mock_payload;
-      const result = typeof mockPayload === 'string' ? JSON.parse(mockPayload) : mockPayload;
+      const rawJson = node.params.raw_json;
+      const result = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
       this.logger.nodeSuccess(nodeId, node.type, result);
       this.successCount++;
       return result;
@@ -81,25 +80,25 @@ class ManifestExecutor {
     }
   }
 
-  private async executeInferenceNode(nodeId: string): Promise<any> {
+  private async executeAiComputeNode(nodeId: string): Promise<any> {
     const node = this.manifest.nodes.find((n) => n.id === nodeId);
     if (!node) throw new Error(`Node ${nodeId} not found`);
 
-    this.logger.nodeStart(nodeId, node.type, node.parameters);
+    this.logger.nodeStart(nodeId, node.type, node.params);
 
     try {
-      const { resolved: resolvedParams } = resolveParametersObject(node.parameters, this.context);
-      const { model_id, system_prompt, input_ref } = resolvedParams;
-      const resolvedInput = typeof input_ref === 'string' ? JSON.parse(input_ref) : input_ref;
+      const { resolved: resolvedParams } = resolveParametersObject(node.params, this.context);
+      const { model, instruction, data_source } = resolvedParams;
+      const resolvedInput = typeof data_source === 'string' ? JSON.parse(data_source) : data_source;
 
-      this.logger.log('debug', `Calling 0G API with model: ${model_id}`, { input: resolvedInput });
+      this.logger.log('debug', `Calling 0G Compute with model: ${model}`, { input: resolvedInput });
 
       const response = await axios.post(
         `${OG_ROUTER_API}/chat/completions`,
         {
-          model: model_id,
+          model: model,
           messages: [
-            { role: 'system', content: system_prompt },
+            { role: 'system', content: instruction },
             { role: 'user', content: JSON.stringify(resolvedInput) },
           ],
           temperature: 0.7,
@@ -113,11 +112,11 @@ class ManifestExecutor {
         }
       );
 
-      const reasoning = response.data.choices?.[0]?.message?.content || '';
+      const output = response.data.choices?.[0]?.message?.content || '';
 
       const result = {
-        model: model_id,
-        reasoning: reasoning,
+        model: model,
+        output: output,
         input: resolvedInput,
         timestamp: new Date().toISOString(),
       };
@@ -132,25 +131,26 @@ class ManifestExecutor {
     }
   }
 
-  private async executeStorageNode(nodeId: string): Promise<any> {
+  private async executeStorageAnchorNode(nodeId: string): Promise<any> {
     const node = this.manifest.nodes.find((n) => n.id === nodeId);
     if (!node) throw new Error(`Node ${nodeId} not found`);
 
-    this.logger.nodeStart(nodeId, node.type, node.parameters);
+    this.logger.nodeStart(nodeId, node.type, node.params);
 
     try {
-      const { resolved: resolvedParams } = resolveParametersObject(node.parameters, this.context);
-      const { value_ref } = resolvedParams;
-      const resolvedValue = typeof value_ref === 'string' ? JSON.parse(value_ref) : value_ref;
+      const { resolved: resolvedParams } = resolveParametersObject(node.params, this.context);
+      const { key, payload } = resolvedParams;
+      const resolvedPayload = typeof payload === 'string' ? JSON.parse(payload) : payload;
 
-      this.logger.log('debug', 'Storing value to 0G network', { value: resolvedValue });
+      this.logger.log('debug', `Anchoring to 0G Storage with key: ${key}`, { payload: resolvedPayload });
 
-      // Simulate storage write - in production, use @0glabs/0g-ts-sdk
-      const simulatedHash = `0x${Buffer.from(JSON.stringify(resolvedValue)).toString('hex').substring(0, 64)}`;
+      // Simulate storage anchor - in production, use @0glabs/0g-ts-sdk
+      const simulatedHash = `0x${Buffer.from(JSON.stringify(resolvedPayload)).toString('hex').substring(0, 64)}`;
 
       const result = {
+        key: key,
         transactionHash: simulatedHash,
-        storedValue: resolvedValue,
+        payload: resolvedPayload,
         timestamp: new Date().toISOString(),
         network: 'og-testnet',
       };
@@ -167,7 +167,7 @@ class ManifestExecutor {
 
   async execute(): Promise<ExecutionResult> {
     try {
-      this.logger.workflowStart(this.manifest.workflow_id, this.manifest.metadata.name);
+      this.logger.workflowStart(this.manifest.workflow_id, `Workflow (${this.manifest.owner})`);
 
       const executionOrder = this.getExecutionOrder();
 
@@ -177,14 +177,14 @@ class ManifestExecutor {
 
         let result;
         switch (node.type) {
-          case 'trigger':
-            result = await this.executeTriggerNode(nodeId);
+          case 'data_input':
+            result = await this.executeDataInputNode(nodeId);
             break;
-          case '0g_inference':
-            result = await this.executeInferenceNode(nodeId);
+          case 'ai_compute':
+            result = await this.executeAiComputeNode(nodeId);
             break;
-          case '0g_storage_write':
-            result = await this.executeStorageNode(nodeId);
+          case 'storage_anchor':
+            result = await this.executeStorageAnchorNode(nodeId);
             break;
           default:
             throw new Error(`Unknown node type: ${node.type}`);

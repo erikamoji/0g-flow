@@ -13,14 +13,14 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useEffect, useMemo } from 'react';
-import { TriggerNode } from './nodes/TriggerNode';
-import { InferenceNode } from './nodes/InferenceNode';
-import { StorageNode } from './nodes/StorageNode';
+import { InputNode } from './nodes/InputNode';
+import { LogicNode } from './nodes/LogicNode';
+import { AnchorNode } from './nodes/AnchorNode';
 
 const nodeTypesMap = {
-  trigger: TriggerNode,
-  '0g_inference': InferenceNode,
-  '0g_storage_write': StorageNode,
+  data_input: InputNode,
+  ai_compute: LogicNode,
+  storage_anchor: AnchorNode,
 };
 
 const initialNodes: Node[] = [];
