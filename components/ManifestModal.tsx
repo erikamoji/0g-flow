@@ -6,9 +6,10 @@ interface ManifestModalProps {
   manifest: Manifest | null;
   isOpen: boolean;
   onClose: () => void;
+  onExecute?: (manifest: Manifest) => void;
 }
 
-export function ManifestModal({ manifest, isOpen, onClose }: ManifestModalProps) {
+export function ManifestModal({ manifest, isOpen, onClose, onExecute }: ManifestModalProps) {
   if (!isOpen || !manifest) return null;
 
   const handleDownload = () => {
@@ -25,6 +26,13 @@ export function ManifestModal({ manifest, isOpen, onClose }: ManifestModalProps)
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(manifest, null, 2));
+  };
+
+  const handleExecute = () => {
+    if (onExecute && manifest) {
+      onExecute(manifest);
+      onClose();
+    }
   };
 
   return (
@@ -55,10 +63,18 @@ export function ManifestModal({ manifest, isOpen, onClose }: ManifestModalProps)
           </button>
           <button
             onClick={handleDownload}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
           >
             Download
           </button>
+          {onExecute && (
+            <button
+              onClick={handleExecute}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            >
+              Execute Now
+            </button>
+          )}
           <button
             onClick={onClose}
             className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
