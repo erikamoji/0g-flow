@@ -1,15 +1,50 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Node, Edge } from 'reactflow';
+import { useAccount } from 'wagmi';
 import { Sidebar } from '@/components/Sidebar';
 import { Canvas } from '@/components/Canvas';
 import { ManifestModal } from '@/components/ManifestModal';
 import { ExecutionTerminal } from '@/components/ExecutionTerminal';
+import { WalletButton } from '@/components/WalletButton';
 import { compileManifest, Manifest } from '@/lib/manifestCompiler';
 import { ExecutionLog } from '@/lib/executionLogger';
 
 export default function Home() {
+  const { isConnected } = useAccount();
+
+  if (!isConnected) {
+    return <LandingPage />;
+  }
+
+  return <Dashboard />;
+}
+
+function LandingPage() {
+  return (
+    <div className="w-full h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center">
+      <div className="text-center max-w-md">
+        <h1 className="text-5xl font-bold text-white mb-4">0G Flow</h1>
+        <p className="text-gray-400 text-lg mb-8">
+          Build decentralized AI workflows on 0G infrastructure
+        </p>
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 mb-8">
+          <p className="text-gray-300 mb-6">
+            Connect your wallet to get started with the visual agent builder.
+          </p>
+          <WalletButton />
+        </div>
+        <p className="text-gray-500 text-sm">
+          Supports MetaMask, WalletConnect, and other Web3 wallets
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard() {
+  const { address } = useAccount();
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [manifest, setManifest] = useState<Manifest | null>(null);
@@ -22,10 +57,11 @@ export default function Home() {
       alert('Please add nodes to the workflow before deploying');
       return;
     }
-    const compiled = compileManifest(nodes, edges);
+
+    const compiled = compileManifest(nodes, edges, 'VM0048 Verification Swarm', address || '0x0');
     setManifest(compiled);
     setIsModalOpen(true);
-  }, [nodes, edges]);
+  }, [nodes, edges, address]);
 
   const handleExecuteManifest = useCallback(async (manifestToExecute: Manifest) => {
     setIsExecuting(true);
@@ -75,6 +111,12 @@ export default function Home() {
             <h2 className="text-white font-semibold">Workflow Designer</h2>
             <p className="text-gray-400 text-sm">
               {nodes.length} nodes {nodes.length > 0 && `• ${edges.length} connections`}
+              {address && (
+                <>
+                  {' '}
+                  • {address.slice(0, 6)}...{address.slice(-4)}
+                </>
+              )}
             </p>
           </div>
           <button
