@@ -12,7 +12,7 @@ import ReactFlow, {
   useEdgesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { TriggerNode } from './nodes/TriggerNode';
 import { InferenceNode } from './nodes/InferenceNode';
 import { StorageNode } from './nodes/StorageNode';
@@ -36,28 +36,16 @@ export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: on
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const nodeTypes = useMemo(() => nodeTypesMap, []);
 
-  const handleNodesChange = (changes: any) => {
-    onNodesChange(changes);
-    setNodes((nds) => {
-      onNodesChangeCallback?.(nds);
-      return nds;
-    });
-  };
+  useEffect(() => {
+    onNodesChangeCallback?.(nodes);
+  }, [nodes, onNodesChangeCallback]);
 
-  const handleEdgesChange = (changes: any) => {
-    onEdgesChange(changes);
-    setEdges((eds) => {
-      onEdgesChangeCallback?.(eds);
-      return eds;
-    });
-  };
+  useEffect(() => {
+    onEdgesChangeCallback?.(edges);
+  }, [edges, onEdgesChangeCallback]);
 
   const onConnect = (connection: Connection) => {
-    setEdges((eds) => {
-      const updated = addEdge(connection, eds);
-      onEdgesChangeCallback?.(updated);
-      return updated;
-    });
+    setEdges((eds) => addEdge(connection, eds));
   };
 
   const onDragOver = (event: React.DragEvent) => {
@@ -86,11 +74,7 @@ export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: on
       data: { label: `${type} node` },
     };
 
-    setNodes((nds) => {
-      const updated = [...nds, newNode];
-      onNodesChangeCallback?.(updated);
-      return updated;
-    });
+    setNodes((nds) => [...nds, newNode]);
   };
 
   return (
@@ -98,8 +82,8 @@ export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: on
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={handleNodesChange}
-        onEdgesChange={handleEdgesChange}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onDragOver={onDragOver}
         onDrop={onDrop}
