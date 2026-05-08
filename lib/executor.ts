@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { Manifest } from './manifestCompiler';
+import { ExecutionLogger } from './executionLogger';
+import { resolveParametersObject, StateStore } from './variableResolver';
 
 export interface ExecutionContext {
   [nodeId: string]: any;
@@ -10,6 +12,7 @@ export interface ExecutionResult {
   workflowId: string;
   results: ExecutionContext;
   error?: string;
+  logs: any[];
 }
 
 const OG_ROUTER_API = 'https://router-api.0g.ai/v1';
@@ -18,29 +21,17 @@ const OG_RPC_URL = 'https://test-rpc.0g.ai';
 class ManifestExecutor {
   private manifest: Manifest;
   private context: ExecutionContext = {};
+  private logger: ExecutionLogger;
+  private successCount = 0;
+  private failureCount = 0;
 
-  constructor(manifest: Manifest) {
+  constructor(manifest: Manifest, logger?: ExecutionLogger) {
     this.manifest = manifest;
+    this.logger = logger || new ExecutionLogger();
   }
 
-  private resolveParameterReferences(value: any, context: ExecutionContext): any {
-    if (typeof value !== 'string') return value;
-
-    const refPattern = /\{\{([^}]+)\}\}/g;
-    return value.replace(refPattern, (match, ref) => {
-      const [nodeId, ...path] = ref.split('.');
-      if (context[nodeId] === undefined) {
-        console.warn(`Referenced node ${nodeId} not found in context`);
-        return match;
-      }
-
-      let result = context[nodeId];
-      for (const key of path) {
-        if (key === 'output') continue;
-        result = result[key];
-      }
-      return result;
-    });
+  getLogger(): ExecutionLogger {
+    return this.logger;
   }
 
   private getExecutionOrder(): string[] {
@@ -75,11 +66,18 @@ class ManifestExecutor {
     const node = this.manifest.nodes.find((n) => n.id === nodeId);
     if (!node) throw new Error(`Node ${nodeId} not found`);
 
-    const mockPayload = node.parameters.mock_payload;
+    this.logger.nodeStart(nodeId, node.type, node.parameters);
+
     try {
-      return JSON.parse(mockPayload);
-    } catch {
-      return { raw: mockPayload };
+      const mockPayload = node.parameters.mock_payload;
+      const result = typeof mockPayload === 'string' ? JSON.parse(mockPayload) : mockPayload;
+      this.logger.nodeSuccess(nodeId, node.type, result);
+      this.successCount++;
+      return result;
+    } catch (error: any) {
+      this.logger.nodeError(nodeId, node.type, error.message);
+      this.failureCount++;
+      throw error;
     }
   }
 
@@ -87,13 +85,15 @@ class ManifestExecutor {
     const node = this.manifest.nodes.find((n) => n.id === nodeId);
     if (!node) throw new Error(`Node ${nodeId} not found`);
 
-    const { model_id, system_prompt, input_ref } = node.parameters;
-    const resolvedInput = this.resolveParameterReferences(input_ref, this.context);
-
-    console.log(`[Inference] Calling 0G API with model: ${model_id}`);
-    console.log(`[Inference] Input: ${JSON.stringify(resolvedInput)}`);
+    this.logger.nodeStart(nodeId, node.type, node.parameters);
 
     try {
+      const { resolved: resolvedParams } = resolveParametersObject(node.parameters, this.context);
+      const { model_id, system_prompt, input_ref } = resolvedParams;
+      const resolvedInput = typeof input_ref === 'string' ? JSON.parse(input_ref) : input_ref;
+
+      this.logger.log('debug', `Calling 0G API with model: ${model_id}`, { input: resolvedInput });
+
       const response = await axios.post(
         `${OG_ROUTER_API}/chat/completions`,
         {
@@ -115,15 +115,20 @@ class ManifestExecutor {
 
       const reasoning = response.data.choices?.[0]?.message?.content || '';
 
-      return {
+      const result = {
         model: model_id,
         reasoning: reasoning,
         input: resolvedInput,
         timestamp: new Date().toISOString(),
       };
+
+      this.logger.nodeSuccess(nodeId, node.type, result);
+      this.successCount++;
+      return result;
     } catch (error: any) {
-      console.error('[Inference] Error calling 0G API:', error.message);
-      throw new Error(`Inference execution failed: ${error.message}`);
+      this.logger.nodeError(nodeId, node.type, error.message);
+      this.failureCount++;
+      throw error;
     }
   }
 
@@ -131,41 +136,44 @@ class ManifestExecutor {
     const node = this.manifest.nodes.find((n) => n.id === nodeId);
     if (!node) throw new Error(`Node ${nodeId} not found`);
 
-    const { value_ref } = node.parameters;
-    const resolvedValue = this.resolveParameterReferences(value_ref, this.context);
-
-    console.log('[Storage] Storing value to 0G network');
-    console.log(`[Storage] Value: ${JSON.stringify(resolvedValue)}`);
+    this.logger.nodeStart(nodeId, node.type, node.parameters);
 
     try {
+      const { resolved: resolvedParams } = resolveParametersObject(node.parameters, this.context);
+      const { value_ref } = resolvedParams;
+      const resolvedValue = typeof value_ref === 'string' ? JSON.parse(value_ref) : value_ref;
+
+      this.logger.log('debug', 'Storing value to 0G network', { value: resolvedValue });
+
       // Simulate storage write - in production, use @0glabs/0g-ts-sdk
       const simulatedHash = `0x${Buffer.from(JSON.stringify(resolvedValue)).toString('hex').substring(0, 64)}`;
 
-      return {
+      const result = {
         transactionHash: simulatedHash,
         storedValue: resolvedValue,
         timestamp: new Date().toISOString(),
         network: 'og-testnet',
       };
+
+      this.logger.nodeSuccess(nodeId, node.type, result, simulatedHash);
+      this.successCount++;
+      return result;
     } catch (error: any) {
-      console.error('[Storage] Error writing to 0G:', error.message);
-      throw new Error(`Storage execution failed: ${error.message}`);
+      this.logger.nodeError(nodeId, node.type, error.message);
+      this.failureCount++;
+      throw error;
     }
   }
 
   async execute(): Promise<ExecutionResult> {
     try {
-      console.log(`\n🚀 Executing workflow: ${this.manifest.workflow_id}`);
-      console.log(`📋 Workflow: ${this.manifest.metadata.name}`);
-      console.log(`👤 Owner: ${this.manifest.metadata.owner}\n`);
+      this.logger.workflowStart(this.manifest.workflow_id, this.manifest.metadata.name);
 
       const executionOrder = this.getExecutionOrder();
 
       for (const nodeId of executionOrder) {
         const node = this.manifest.nodes.find((n) => n.id === nodeId);
         if (!node) continue;
-
-        console.log(`⏳ Executing node: ${nodeId} (type: ${node.type})`);
 
         let result;
         switch (node.type) {
@@ -183,30 +191,30 @@ class ManifestExecutor {
         }
 
         this.context[nodeId] = result;
-        console.log(`✅ Node ${nodeId} completed\n`);
       }
 
-      console.log(`\n🎉 Workflow execution completed successfully!`);
-      console.log(`📊 Final results: ${Object.keys(this.context).length} nodes executed\n`);
+      this.logger.workflowComplete(this.manifest.workflow_id, this.successCount, this.failureCount);
 
       return {
         success: true,
         workflowId: this.manifest.workflow_id,
         results: this.context,
+        logs: this.logger.getLogs(),
       };
     } catch (error: any) {
-      console.error(`\n❌ Workflow execution failed: ${error.message}\n`);
+      this.logger.workflowFailed(this.manifest.workflow_id, error.message);
       return {
         success: false,
         workflowId: this.manifest.workflow_id,
         results: this.context,
         error: error.message,
+        logs: this.logger.getLogs(),
       };
     }
   }
 }
 
-export async function executeManifest(manifest: Manifest): Promise<ExecutionResult> {
-  const executor = new ManifestExecutor(manifest);
+export async function executeManifest(manifest: Manifest, logger?: ExecutionLogger): Promise<ExecutionResult> {
+  const executor = new ManifestExecutor(manifest, logger);
   return executor.execute();
 }
