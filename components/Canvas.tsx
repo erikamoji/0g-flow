@@ -16,11 +16,16 @@ import { useEffect, useMemo } from 'react';
 import { InputNode } from './nodes/InputNode';
 import { LogicNode } from './nodes/LogicNode';
 import { AnchorNode } from './nodes/AnchorNode';
+import { GradientEdge } from './edges/GradientEdge';
 
 const nodeTypesMap = {
   data_input: InputNode,
   ai_compute: LogicNode,
   storage_anchor: AnchorNode,
+};
+
+const edgeTypesMap = {
+  gradient: GradientEdge,
 };
 
 const initialNodes: Node[] = [];
@@ -29,12 +34,14 @@ const initialEdges: Edge[] = [];
 interface CanvasProps {
   onNodesChange?: (nodes: Node[]) => void;
   onEdgesChange?: (edges: Edge[]) => void;
+  isRunning?: boolean;
 }
 
-export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: onEdgesChangeCallback }: CanvasProps) {
+export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: onEdgesChangeCallback, isRunning = false }: CanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const nodeTypes = useMemo(() => nodeTypesMap, []);
+  const edgeTypes = useMemo(() => edgeTypesMap, []);
 
   useEffect(() => {
     onNodesChangeCallback?.(nodes);
@@ -44,8 +51,13 @@ export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: on
     onEdgesChangeCallback?.(edges);
   }, [edges, onEdgesChangeCallback]);
 
+  // Propagate the running flag into each edge's data so GradientEdge can animate.
+  useEffect(() => {
+    setEdges((eds) => eds.map((e) => ({ ...e, data: { ...(e.data || {}), isRunning } })));
+  }, [isRunning, setEdges]);
+
   const onConnect = (connection: Connection) => {
-    setEdges((eds) => addEdge(connection, eds));
+    setEdges((eds) => addEdge({ ...connection, type: 'gradient', data: { isRunning } }, eds));
   };
 
   const onDragOver = (event: React.DragEvent) => {
@@ -78,7 +90,7 @@ export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: on
   };
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-full flex-1 flow-canvas-bg">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -88,11 +100,12 @@ export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: on
         onDragOver={onDragOver}
         onDrop={onDrop}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
       >
-        <Background />
-        <Controls />
-        <MiniMap />
+        <Background gap={24} size={1} color="rgba(255,255,255,0.045)" />
+        <Controls style={{ backgroundColor: '#131922', border: '1px solid #232C3C', borderRadius: 8 }} />
+        <MiniMap maskColor="rgba(7,9,12,0.6)" nodeColor="#2A7BFF" style={{ backgroundColor: '#0C1117', border: '1px solid #232C3C' }} />
       </ReactFlow>
     </div>
   );

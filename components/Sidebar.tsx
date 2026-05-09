@@ -12,52 +12,51 @@ export function Sidebar() {
   };
 
   return (
-    <div className="w-64 bg-gray-900 text-white p-6 border-r border-gray-800 shadow-lg overflow-y-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">0G Flow</h1>
-        <p className="text-gray-400 text-sm mt-1">Visual Agent Builder</p>
+    <aside className="sidebar" style={{ width: 280 }}>
+      <div className="sidebar-section">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h1 className="brand-wordmark" style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em', margin: 0 }}>0G Flow</h1>
+          <span className="hdr-net"><span className="dot" />GALILEO</span>
+        </div>
+        <p className="eyebrow" style={{ marginTop: 6 }}>Visual Agent Builder</p>
       </div>
 
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-4 text-gray-300">Nodes</h2>
-        <p className="text-xs text-gray-500 mb-4">Drag nodes onto the canvas</p>
-
-        <div className="space-y-3">
-          {(Object.entries(NODE_TYPES) as Array<[NodeType, any]>).map(
-            ([key, config]) => (
-              <div
-                key={key}
-                draggable
-                onDragStart={(e) => onDragStart(e, key)}
-                className="p-3 bg-gray-800 rounded-lg cursor-move hover:bg-gray-700 transition-colors border-l-4"
-                style={{
-                  borderLeftColor: {
-                    data_input: '#60a5fa',
-                    ai_compute: '#a78bfa',
-                    storage_anchor: '#34d399',
-                  }[key],
-                }}
-              >
-                <div className="font-semibold text-sm">
-                  {config.icon} {config.label}
-                </div>
-                <div className="text-xs text-gray-400 mt-1">
-                  {config.description}
+      <div className="sidebar-section">
+        <div className="eyebrow">Node Palette</div>
+        <div className="palette-list">
+          {(Object.entries(NODE_TYPES) as Array<[NodeType, any]>).map(([key, config]) => {
+            const variantClass = { data_input: 'input', ai_compute: 'logic', storage_anchor: 'anchor' }[key] || 'input';
+            const subId = { data_input: 'IN · TRIGGER', ai_compute: 'LX · 0G COMPUTE', storage_anchor: 'AN · 0G STORAGE' }[key] || '';
+            const iconSvg = {
+              data_input:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/><path d="M12 4v12"/><path d="M7 11l5 5 5-5"/></svg>,
+              ai_compute:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="6" y="6" width="12" height="12" rx="1"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>,
+              storage_anchor:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>,
+            }[key];
+            return (
+              <div key={key}
+                   draggable
+                   onDragStart={(e) => onDragStart(e, key)}
+                   className={`palette-item ${variantClass}`}>
+                <div className="icon">{iconSvg}</div>
+                <div className="meta">
+                  <div className="name">{config.label}</div>
+                  <div className="sub">{subId}</div>
                 </div>
               </div>
-            )
-          )}
+            );
+          })}
         </div>
       </div>
 
-      <div className="border-t border-gray-700 pt-6 mt-6">
-        <h3 className="text-sm font-semibold mb-3 text-gray-300">How It Works</h3>
-        <ol className="text-xs text-gray-500 leading-relaxed space-y-2">
-          <li>1. <strong>Input</strong> – Define your data source</li>
-          <li>2. <strong>Logic</strong> – Process with 0G AI compute</li>
-          <li>3. <strong>Anchor</strong> – Persist to decentralized storage</li>
+      <div className="sidebar-section">
+        <div className="eyebrow">How It Works</div>
+        <ol style={{ marginTop: 12, paddingLeft: 18, color: 'var(--fg-3)', fontSize: 12, lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <li><strong style={{ color: 'var(--fg-2)' }}>Input</strong> — define the data source</li>
+          <li><strong style={{ color: 'var(--fg-2)' }}>Logic</strong> — process with 0G AI compute</li>
+          <li><strong style={{ color: 'var(--fg-2)' }}>Anchor</strong> — persist to decentralized storage</li>
         </ol>
       </div>
-    </div>
+    </aside>
   );
 }
+
