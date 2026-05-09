@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Status palette</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .tile { background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 110px; }
+  .head { display: flex; justify-content: space-between; align-items: center; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid">
+    <div class="tile"><div class="head"><span class="label">ok</span><div class="dot" style="background:#34D399; box-shadow: 0 0 12px var(--ok-glow);"></div></div><span class="hex">#34D399</span><span style="color:#34D399; font:var(--t-num)">RUN COMPLETE</span></div>
+    <div class="tile"><div class="head"><span class="label">idle</span><div class="dot" style="background:#F5B544; box-shadow: 0 0 12px var(--idle-glow);"></div></div><span class="hex">#F5B544</span><span style="color:#F5B544; font:var(--t-num)">AWAITING INPUT</span></div>
+    <div class="tile"><div class="head"><span class="label">warn</span><div class="dot" style="background:#F08A3A;"></div></div><span class="hex">#F08A3A</span><span style="color:#F08A3A; font:var(--t-num)">RATE LIMITED</span></div>
+    <div class="tile"><div class="head"><span class="label">err</span><div class="dot" style="background:#F47174; box-shadow: 0 0 12px var(--err-glow);"></div></div><span class="hex">#F47174</span><span style="color:#F47174; font:var(--t-num)">REJECTED</span></div>
+  </div>
+</div></body></html>

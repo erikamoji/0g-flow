@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Foreground</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .tile { background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+  .swatch-line { height: 28px; border-radius: 4px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid">
+    <div class="tile"><div class="head"><span class="label">fg-1</span><span class="hex">#E8ECF3</span></div><div class="swatch-line" style="background:#E8ECF3"></div><span style="color:#E8ECF3; font:var(--t-body)">Primary text</span></div>
+    <div class="tile"><div class="head"><span class="label">fg-2</span><span class="hex">#A6B0C2</span></div><div class="swatch-line" style="background:#A6B0C2"></div><span style="color:#A6B0C2; font:var(--t-body)">Secondary text</span></div>
+    <div class="tile"><div class="head"><span class="label">fg-3</span><span class="hex">#6B7585</span></div><div class="swatch-line" style="background:#6B7585"></div><span style="color:#6B7585; font:var(--t-body)">Tertiary / muted</span></div>
+    <div class="tile"><div class="head"><span class="label">fg-4</span><span class="hex">#4A5365</span></div><div class="swatch-line" style="background:#4A5365"></div><span style="color:#4A5365; font:var(--t-body)">Disabled</span></div>
+  </div>
+</div></body></html>

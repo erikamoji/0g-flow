@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wordmark</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .stack { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
+  .lockup { display: flex; align-items: center; gap: 12px; }
+  .lockup img { height: 36px; }
+  .ondark { background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 12px; padding: 14px 18px; }
+  .onglow { background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 12px; padding: 14px 18px; box-shadow: 0 0 30px -8px rgba(124,92,255,0.35), inset 0 0 0 1px rgba(180,154,255,0.18); }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="stack">
+    <div class="lockup ondark"><img src="../assets/logos/flow-wordmark.svg" alt=""></div>
+    <div class="lockup onglow"><img src="../assets/logos/flow-wordmark.svg" alt=""></div>
+  </div>
+</div></body></html>

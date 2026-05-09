@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Status pills + dots</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pill { display: inline-flex; gap: 8px; align-items: center; padding: 5px 10px; border-radius: 999px; font: var(--t-eyebrow); letter-spacing: 0.14em; text-transform: uppercase; border: 1px solid var(--line-2); background: var(--bg-1); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .ok    { color: var(--ok-500); border-color: rgba(52,211,153,0.30); background: rgba(52,211,153,0.08); }
+  .ok .dot   { background: var(--ok-500); box-shadow: 0 0 10px var(--ok-glow); }
+  .idle  { color: var(--idle-500); border-color: rgba(245,181,68,0.30); background: rgba(245,181,68,0.08); }
+  .idle .dot { background: var(--idle-500); box-shadow: 0 0 10px var(--idle-glow); }
+  .err   { color: var(--err-500); border-color: rgba(244,113,116,0.30); background: rgba(244,113,116,0.08); }
+  .err .dot  { background: var(--err-500); box-shadow: 0 0 10px var(--err-glow); }
+  .warn  { color: var(--warn-500); border-color: rgba(240,138,58,0.30); background: rgba(240,138,58,0.08); }
+  .warn .dot { background: var(--warn-500); }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="row">
+    <span class="pill ok"><span class="dot"></span>Run · Complete</span>
+    <span class="pill idle"><span class="dot"></span>Awaiting Input</span>
+    <span class="pill err"><span class="dot"></span>Sealed Reject</span>
+    <span class="pill warn"><span class="dot"></span>Rate Limited</span>
+  </div>
+</div></body></html>

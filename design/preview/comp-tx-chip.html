@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tx hash + receipt chip</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .chip { display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; height: 30px; border-radius: 6px; background: var(--bg-2); border: 1px solid var(--line-2); font: var(--t-num); color: var(--fg-1); }
+  .chip .l { font: var(--t-eyebrow); letter-spacing: 0.14em; color: var(--fg-3); margin-right: 4px; }
+  .chip.tx { color: var(--input-300); }
+  .chip svg { width: 14px; height: 14px; color: var(--fg-3); }
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="stack">
+    <div class="row">
+      <span class="chip tx"><span class="l">tx</span>0x4f3a…b27c <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
+      <span class="chip"><span class="l">block</span>2,481,902</span>
+      <span class="chip"><span class="l">gas</span>1,240</span>
+      <span class="chip"><span class="l">⏱</span>2.4s</span>
+    </div>
+  </div>
+</div></body></html>

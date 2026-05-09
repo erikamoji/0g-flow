@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Form fields</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field .l { font: var(--t-eyebrow); letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-3); }
+  input, select { font: var(--t-body); height: 36px; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 6px; color: var(--fg-1); padding: 0 12px; outline: none; }
+  input:focus { border-color: var(--input-500); box-shadow: 0 0 0 3px rgba(42,123,255,0.18); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .hint { font: var(--t-meta); color: var(--fg-3); letter-spacing: 0.10em; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="stack">
+    <div class="row">
+      <div class="field">
+        <span class="l">Endpoint</span>
+        <input type="text" value="https://rpc.galileo.0g.ai">
+      </div>
+      <div class="field">
+        <span class="l">Model</span>
+        <input type="text" value="qwen2.5-7b" style="font-family: var(--font-mono); font-size:13px;">
+      </div>
+    </div>
+    <span class="hint">Focus ring · 3px · INPUT-500 · gap 1px</span>
+  </div>
+</div></body></html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Node glow rings</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; padding: 16px 8px; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .node { width: 100%; height: 70px; background: var(--bg-2); border-radius: 10px; }
+  .ni { box-shadow: var(--glow-input); }
+  .nl { box-shadow: var(--glow-logic); }
+  .na { box-shadow: var(--glow-anchor); }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid">
+    <div class="tile"><div class="node ni"></div><span class="label" style="color:#6FB1FF">glow-input</span></div>
+    <div class="tile"><div class="node nl"></div><span class="label" style="color:#B49AFF">glow-logic</span></div>
+    <div class="tile"><div class="node na"></div><span class="label" style="color:#5DE3A5">glow-anchor</span></div>
+  </div>
+</div></body></html>

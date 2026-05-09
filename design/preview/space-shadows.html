@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shadow / elevation</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 0 0; }
+  .surface { width: 100%; height: 90px; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 14px; }
+  .s1 { box-shadow: var(--shadow-1); }
+  .s2 { box-shadow: var(--shadow-2); }
+  .s3 { box-shadow: var(--shadow-3); }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid">
+    <div class="tile"><div class="surface s1"></div><span class="label">shadow-1 · subtle</span></div>
+    <div class="tile"><div class="surface s2"></div><span class="label">shadow-2 · raised</span></div>
+    <div class="tile"><div class="surface s3"></div><span class="label">shadow-3 · drawer</span></div>
+  </div>
+</div></body></html>

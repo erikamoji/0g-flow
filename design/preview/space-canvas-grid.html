@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Canvas grid</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .canvas { height: 160px; border-radius: 12px; border: 1px solid var(--line-2); background-color: var(--bg-0); background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.045) 1px, transparent 0); background-size: 24px 24px; position: relative; overflow: hidden; }
+  .label-pill { position: absolute; top: 12px; left: 12px; font: var(--t-eyebrow); letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-3); padding: 4px 8px; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 4px; }
+  .specs { position: absolute; bottom: 12px; right: 12px; font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="canvas">
+    <span class="label-pill">.flow-canvas-bg</span>
+    <span class="specs">24px · 1px dot · rgba(255,255,255,0.045)</span>
+  </div>
+</div></body></html>

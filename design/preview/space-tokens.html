@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spacing tokens</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .scale { display: flex; flex-direction: column; gap: 8px; }
+  .row { display: grid; grid-template-columns: 60px 80px 1fr; align-items: center; gap: 16px; }
+  .row .l { font: var(--t-eyebrow); letter-spacing: 0.14em; color: var(--fg-3); }
+  .row .v { font: var(--t-num); color: var(--fg-1); }
+  .bar { height: 8px; background: linear-gradient(90deg, #6FB1FF, #B49AFF); border-radius: 2px; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="scale">
+    <div class="row"><span class="l">s-1</span><span class="v">4 px</span><div class="bar" style="width:4px"></div></div>
+    <div class="row"><span class="l">s-2</span><span class="v">8 px</span><div class="bar" style="width:8px"></div></div>
+    <div class="row"><span class="l">s-3</span><span class="v">12 px</span><div class="bar" style="width:12px"></div></div>
+    <div class="row"><span class="l">s-4</span><span class="v">16 px</span><div class="bar" style="width:16px"></div></div>
+    <div class="row"><span class="l">s-5</span><span class="v">20 px</span><div class="bar" style="width:20px"></div></div>
+    <div class="row"><span class="l">s-6</span><span class="v">24 px</span><div class="bar" style="width:24px"></div></div>
+    <div class="row"><span class="l">s-7</span><span class="v">32 px</span><div class="bar" style="width:32px"></div></div>
+    <div class="row"><span class="l">s-8</span><span class="v">48 px</span><div class="bar" style="width:48px"></div></div>
+    <div class="row"><span class="l">s-9</span><span class="v">64 px</span><div class="bar" style="width:64px"></div></div>
+  </div>
+</div></body></html>

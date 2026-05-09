@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brand mark</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .wrap { display: flex; align-items: center; gap: 32px; }
+  .swatch { width: 96px; height: 96px; display: grid; place-items: center; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 14px; }
+  .swatch img { width: 56px; height: 56px; }
+  .grad-tile { width: 96px; height: 96px; border-radius: 14px; background: var(--brand-grad); }
+  .meta-rows { display: grid; grid-template-columns: auto auto; gap: 6px 16px; align-items: baseline; }
+  .meta-rows .k { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .meta-rows .v { font: var(--t-num); color: var(--fg-1); font-size: 12px; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="wrap">
+    <div class="swatch"><img src="../assets/logos/flow-mark.svg" alt=""></div>
+    <div class="grad-tile"></div>
+    <div class="col" style="gap:12px">
+      <div class="meta-rows">
+        <span class="k">mark</span><span class="v">flow-mark.svg · 40·40</span>
+        <span class="k">wordmark</span><span class="v">flow-wordmark.svg · 200·40</span>
+        <span class="k">gradient</span><span class="v">--brand-grad · 135°</span>
+        <span class="k">stops</span><span class="v">#6FB1FF → #B49AFF → #5DE3A5</span>
+      </div>
+    </div>
+  </div>
+</div></body></html>

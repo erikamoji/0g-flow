@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Node port handles</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .canvas { padding: 30px 20px; background-color: var(--bg-0); background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.045) 1px, transparent 0); background-size: 24px 24px; border: 1px solid var(--line-2); border-radius: 12px; display: flex; align-items: center; justify-content: space-around; }
+  .pair { display: flex; align-items: center; gap: 14px; }
+  .label { font: var(--t-eyebrow); letter-spacing: 0.14em; color: var(--fg-3); }
+  .port { width: 14px; height: 14px; border-radius: 50%; background: var(--bg-3); border: 2px solid var(--line-3); }
+  .port.in   { border-color: #6FB1FF; box-shadow: 0 0 8px rgba(111,177,255,0.5); }
+  .port.lo   { border-color: #B49AFF; box-shadow: 0 0 8px rgba(180,154,255,0.5); }
+  .port.an   { border-color: #5DE3A5; box-shadow: 0 0 8px rgba(93,227,165,0.5); }
+  .port.active { background: currentColor; }
+  .edge { height: 2px; width: 60px; border-radius: 1px; background: linear-gradient(90deg, #6FB1FF, #B49AFF); }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="canvas">
+    <div class="pair"><span class="label">in</span><div class="port in"></div></div>
+    <div class="pair"><div class="port in active" style="background:#6FB1FF;"></div><div class="edge"></div><div class="port lo"></div></div>
+    <div class="pair"><div class="port lo"></div><div class="edge" style="background:linear-gradient(90deg,#B49AFF,#5DE3A5);"></div><div class="port an"></div></div>
+    <div class="pair"><span class="label">out</span><div class="port an"></div></div>
+  </div>
+</div></body></html>

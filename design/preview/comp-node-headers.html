@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Node headers</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .node { background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; }
+  .nh { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line-1); }
+  .nh .icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 6px; }
+  .nh .name { font: 600 13px/1 var(--font-sans); color: var(--fg-1); flex: 1; }
+  .nh .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok-500); box-shadow: 0 0 10px var(--ok-glow); }
+  .nh .id { font: var(--t-meta); color: var(--fg-3); letter-spacing: 0.12em; }
+  .nb { padding: 12px; font: var(--t-code); color: var(--fg-2); }
+  .ni { box-shadow: var(--glow-input); }
+  .ni .icon { background: rgba(42,123,255,0.12); color: #6FB1FF; }
+  .nl { box-shadow: var(--glow-logic); }
+  .nl .icon { background: rgba(124,92,255,0.14); color: #B49AFF; }
+  .na { box-shadow: var(--glow-anchor); }
+  .na .icon { background: rgba(16,185,129,0.14); color: #5DE3A5; }
+  .nh .icon svg { width: 16px; height: 16px; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid">
+    <div class="node ni"><div class="nh"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M17 12h4M19 10l2 2-2 2"/></svg></div><span class="name">Input</span><span class="id">IN·01</span><span class="dot"></span></div><div class="nb">{ "trigger": "manual" }</div></div>
+    <div class="node nl"><div class="nh"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M3 12h3M18 12h3M12 3v3M12 18v3"/></svg></div><span class="name">Logic · 0G Compute</span><span class="id">LX·07</span><span class="dot"></span></div><div class="nb">qwen2.5-7b · sealed</div></div>
+    <div class="node na"><div class="nh"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><circle cx="12" cy="6" r="2"/><path d="M5 13c0 4 3 7 7 7s7-3 7-7"/></svg></div><span class="name">Anchor · 0G Storage</span><span class="id">AN·02</span><span class="dot"></span></div><div class="nb">commit · keccak256</div></div>
+  </div>
+</div></body></html>

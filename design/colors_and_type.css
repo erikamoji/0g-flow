@@ -1,0 +1,140 @@
+/* ============================================================
+   0G Flow — colors & type
+   System-Architect dark theme · modular neon accents
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* -------- Coal / Slate surfaces -------- */
+  --bg-0:        #07090C;   /* page coal */
+  --bg-1:        #0C1117;   /* primary surface */
+  --bg-2:        #131922;   /* panel */
+  --bg-3:        #1B2230;   /* raised / hover */
+  --bg-4:        #232C3C;   /* overlay / popover */
+
+  /* -------- Hairlines & borders -------- */
+  --line-1:      #1A2230;   /* faint divider */
+  --line-2:      #232C3C;   /* default border */
+  --line-3:      #2F3A4D;   /* strong border / focus ring base */
+
+  /* -------- Foreground -------- */
+  --fg-1:        #E8ECF3;   /* primary text */
+  --fg-2:        #A6B0C2;   /* secondary text */
+  --fg-3:        #6B7585;   /* tertiary / muted */
+  --fg-4:        #4A5365;   /* disabled */
+
+  /* -------- Modular neon accents -------- */
+  /* Input — Blue */
+  --input-50:    #E6F1FF;
+  --input-300:   #6FB1FF;
+  --input-500:   #2A7BFF;
+  --input-600:   #1F5FE0;
+  --input-glow:  rgba(42, 123, 255, 0.35);
+
+  /* Logic / AI — Violet */
+  --logic-50:    #F1ECFF;
+  --logic-300:   #B49AFF;
+  --logic-500:   #7C5CFF;
+  --logic-600:   #6244E0;
+  --logic-glow:  rgba(124, 92, 255, 0.40);
+
+  /* Storage / Anchor — Emerald */
+  --anchor-50:   #DDFBEC;
+  --anchor-300:  #5DE3A5;
+  --anchor-500:  #10B981;
+  --anchor-600:  #07956A;
+  --anchor-glow: rgba(16, 185, 129, 0.35);
+
+  /* -------- Status -------- */
+  --ok-500:      #34D399;
+  --ok-glow:     rgba(52, 211, 153, 0.55);
+  --idle-500:    #F5B544;
+  --idle-glow:   rgba(245, 181, 68, 0.50);
+  --warn-500:    #F08A3A;
+  --err-500:     #F47174;
+  --err-glow:    rgba(244, 113, 116, 0.45);
+
+  /* -------- Brand wordmark gradient (0G Flow) -------- */
+  --brand-grad:  linear-gradient(135deg, #6FB1FF 0%, #B49AFF 55%, #5DE3A5 100%);
+
+  /* -------- Type families -------- */
+  --font-sans:   "Inter Tight", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-mono:   "JetBrains Mono", "SF Mono", Menlo, ui-monospace, monospace;
+
+  /* -------- Type scale (semantic) -------- */
+  --t-display:   600 56px/1.05 var(--font-sans);     /* hero, marketing */
+  --t-h1:        600 32px/1.15 var(--font-sans);     /* page titles */
+  --t-h2:        600 22px/1.25 var(--font-sans);     /* section heads */
+  --t-h3:        600 16px/1.30 var(--font-sans);     /* card titles */
+  --t-body:      400 14px/1.55 var(--font-sans);     /* default body */
+  --t-body-sm:   400 13px/1.55 var(--font-sans);
+  --t-meta:      500 11px/1.30 var(--font-mono);     /* tx hashes, ids */
+  --t-eyebrow:   500 10.5px/1.0 var(--font-mono);    /* caps labels */
+  --t-num:       500 13px/1.25 var(--font-mono);     /* numerics, code */
+  --t-code:      400 12.5px/1.55 var(--font-mono);   /* code blocks, json */
+
+  /* -------- Spacing tokens -------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 48px;
+  --s-9: 64px;
+
+  /* -------- Radii -------- */
+  --r-xs: 3px;     /* chips, dots */
+  --r-sm: 6px;    /* inputs, ports */
+  --r-md: 8px;     /* buttons */
+  --r-lg: 10px;    /* nodes */
+  --r-xl: 14px;    /* panels */
+  --r-2xl: 20px;   /* drawers, modals */
+
+  /* -------- Elevation / shadow -------- */
+  --shadow-1:    0 1px 0 rgba(255,255,255,0.02) inset, 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-2:    0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 24px rgba(0,0,0,0.45);
+  --shadow-3:    0 1px 0 rgba(255,255,255,0.04) inset, 0 24px 60px rgba(0,0,0,0.55);
+  --ring-focus:  0 0 0 1px var(--bg-1), 0 0 0 3px var(--input-500);
+
+  /* Node glow rings */
+  --glow-input:  0 0 0 1px rgba(111,177,255,0.35), 0 0 24px -2px var(--input-glow);
+  --glow-logic:  0 0 0 1px rgba(180,154,255,0.35), 0 0 24px -2px var(--logic-glow);
+  --glow-anchor: 0 0 0 1px rgba(93,227,165,0.35), 0 0 24px -2px var(--anchor-glow);
+
+  /* -------- Canvas grid -------- */
+  --grid-dot:    rgba(255,255,255,0.045);
+  --grid-size:   24px;
+}
+
+/* ============================================================
+   Semantic element styles — apply directly when using this
+   stylesheet outside of the React kit.
+   ============================================================ */
+
+html, body {
+  background: var(--bg-0);
+  color: var(--fg-1);
+  font: var(--t-body);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1 { font: var(--t-h1); color: var(--fg-1); letter-spacing: -0.01em; }
+h2 { font: var(--t-h2); color: var(--fg-1); letter-spacing: -0.005em; }
+h3 { font: var(--t-h3); color: var(--fg-1); }
+p  { font: var(--t-body); color: var(--fg-2); }
+small, .meta { font: var(--t-meta); color: var(--fg-3); letter-spacing: 0.12em; text-transform: uppercase; }
+code, pre, kbd { font: var(--t-code); color: var(--fg-1); }
+
+::selection { background: var(--input-500); color: white; }
+
+/* Canvas dotted grid bg */
+.flow-canvas-bg {
+  background-color: var(--bg-0);
+  background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0);
+  background-size: var(--grid-size) var(--grid-size);
+}

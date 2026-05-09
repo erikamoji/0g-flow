@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Headings</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line-1); }
+  .row:last-child { border: none; }
+  .row .meta { font: var(--t-num); color: var(--fg-3); white-space: nowrap; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="stack">
+    <div class="row"><h2 style="font:var(--t-h2); color: var(--fg-1); margin:0;">Sealed inference</h2><span class="meta">h2 · 22/1.25</span></div>
+    <div class="row"><h3 style="font:var(--t-h3); color: var(--fg-1); margin:0;">Model · Qwen 2.5 — 7B</h3><span class="meta">h3 · 16/1.30</span></div>
+    <div class="row"><p style="font:var(--t-body); color: var(--fg-2); margin:0;">Drag a node from the palette onto the canvas to begin composing.</p><span class="meta">body · 14/1.55</span></div>
+  </div>
+</div></body></html>

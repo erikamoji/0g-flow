@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Modular neons</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .tile { background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .stops { display: flex; gap: 4px; height: 26px; border-radius: 4px; overflow: hidden; }
+  .stops > div { flex: 1; }
+  .head-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .pill { font: var(--t-eyebrow); letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; }
+  .glow-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid">
+    <div class="tile" style="border-color: rgba(111,177,255,0.25); box-shadow: inset 0 0 0 1px rgba(111,177,255,0.05), 0 0 30px -10px var(--input-glow);">
+      <div class="head-row">
+        <span class="pill" style="color:#6FB1FF; background: rgba(42,123,255,0.12);">INPUT · BLUE</span>
+        <div class="glow-dot" style="background:#6FB1FF; box-shadow: 0 0 12px var(--input-glow);"></div>
+      </div>
+      <div class="stops"><div style="background:#E6F1FF"></div><div style="background:#6FB1FF"></div><div style="background:#2A7BFF"></div><div style="background:#1F5FE0"></div></div>
+      <div class="hex">data · triggers · json</div>
+    </div>
+    <div class="tile" style="border-color: rgba(180,154,255,0.25); box-shadow: inset 0 0 0 1px rgba(180,154,255,0.05), 0 0 30px -10px var(--logic-glow);">
+      <div class="head-row">
+        <span class="pill" style="color:#B49AFF; background: rgba(124,92,255,0.14);">LOGIC · VIOLET</span>
+        <div class="glow-dot" style="background:#B49AFF; box-shadow: 0 0 12px var(--logic-glow);"></div>
+      </div>
+      <div class="stops"><div style="background:#F1ECFF"></div><div style="background:#B49AFF"></div><div style="background:#7C5CFF"></div><div style="background:#6244E0"></div></div>
+      <div class="hex">0g compute · sealed inference</div>
+    </div>
+    <div class="tile" style="border-color: rgba(93,227,165,0.25); box-shadow: inset 0 0 0 1px rgba(93,227,165,0.05), 0 0 30px -10px var(--anchor-glow);">
+      <div class="head-row">
+        <span class="pill" style="color:#5DE3A5; background: rgba(16,185,129,0.14);">ANCHOR · EMERALD</span>
+        <div class="glow-dot" style="background:#5DE3A5; box-shadow: 0 0 12px var(--anchor-glow);"></div>
+      </div>
+      <div class="stops"><div style="background:#DDFBEC"></div><div style="background:#5DE3A5"></div><div style="background:#10B981"></div><div style="background:#07956A"></div></div>
+      <div class="hex">0g storage · anchoring</div>
+    </div>
+  </div>
+</div></body></html>

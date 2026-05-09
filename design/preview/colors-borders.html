@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Borders</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .tile { background: var(--bg-1); border-radius: 10px; padding: 18px; min-height: 100px; display: flex; flex-direction: column; gap: 10px; }
+  .swatch { height: 36px; border-radius: 6px; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid">
+    <div class="tile" style="border:1px solid #1A2230"><span class="label">line-1 · faint</span><span class="hex">#1A2230</span><div class="swatch" style="background:#0C1117; border:1px solid #1A2230"></div></div>
+    <div class="tile" style="border:1px solid #232C3C"><span class="label">line-2 · default</span><span class="hex">#232C3C</span><div class="swatch" style="background:#0C1117; border:1px solid #232C3C"></div></div>
+    <div class="tile" style="border:1px solid #2F3A4D"><span class="label">line-3 · strong</span><span class="hex">#2F3A4D</span><div class="swatch" style="background:#0C1117; border:1px solid #2F3A4D"></div></div>
+  </div>
+</div></body></html>

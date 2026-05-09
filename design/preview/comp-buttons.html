@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Buttons</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg-0); }
+  .card { padding: 24px 28px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  .label { font: var(--t-eyebrow); color: var(--fg-3); letter-spacing: 0.14em; text-transform: uppercase; }
+  .hex { font: var(--t-num); color: var(--fg-3); font-size: 11px; }
+  .name { font: 500 12px/1.2 var(--font-sans); color: var(--fg-1); }
+  
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font: 500 13px/1 var(--font-sans); padding: 0 14px; height: 32px; display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
+  .btn-primary { background: var(--input-500); color: white; border-color: rgba(255,255,255,0.08); box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 8px 20px -8px var(--input-glow); }
+  .btn-ghost { background: var(--bg-2); color: var(--fg-1); border-color: var(--line-2); }
+  .btn-deploy { background: var(--brand-grad); color: #0C1117; font-weight: 600; padding: 0 20px; height: 36px; border-radius: 10px; box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset, 0 0 30px -6px rgba(180,154,255,0.5); }
+  .btn-danger { background: transparent; color: var(--err-500); border-color: rgba(244,113,116,0.3); }
+  .btn-quiet { background: transparent; color: var(--fg-2); }
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="stack">
+    <div class="row">
+      <button class="btn btn-deploy">⌁ Deploy</button>
+      <button class="btn btn-primary">Connect Wallet</button>
+      <button class="btn btn-ghost">Inspect Run</button>
+      <button class="btn btn-quiet">Cancel</button>
+      <button class="btn btn-danger">Discard Draft</button>
+    </div>
+    <div class="row">
+      <span class="hex" style="font-family:var(--font-mono); color:var(--fg-3);">primary · 32h · radius 8</span>
+      <span class="hex" style="font-family:var(--font-mono); color:var(--fg-3);">deploy · 36h · radius 10 · brand grad</span>
+    </div>
+  </div>
+</div></body></html>
