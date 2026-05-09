@@ -36,48 +36,50 @@ export function ManifestModal({ manifest, isOpen, onClose, onExecute }: Manifest
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-96 overflow-auto border border-gray-700">
-        <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Generated Manifest</h2>
+    <div className="fixed inset-0 bg-bg-0/70 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-bg-2 border border-line-2 rounded-2xl shadow-[var(--shadow-3)] max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+        <div className="bg-bg-2 border-b border-line-2 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-fg-1 text-base font-semibold tracking-tight">Generated Manifest</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-fg-3 hover:text-fg-1 transition-colors"
           >
-            ✕
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
           </button>
         </div>
 
-        <div className="p-6">
-          <pre className="bg-gray-900 rounded-lg p-4 text-sm text-gray-100 overflow-x-auto font-mono">
+        <div className="p-6 overflow-auto flex-1">
+          <pre className="bg-bg-1 border border-line-1 rounded-md p-4 text-xs text-fg-2 overflow-x-auto font-mono">
             {JSON.stringify(manifest, null, 2)}
           </pre>
         </div>
 
-        <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 px-6 py-4 flex gap-3 justify-end">
+        <div className="bg-bg-2 border-t border-line-2 px-6 py-4 flex gap-3 justify-end">
           <button
             onClick={handleCopy}
-            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-bg-3 hover:bg-bg-4 text-fg-1 px-4 py-2 rounded-md text-sm transition-colors"
           >
             Copy
           </button>
           <button
             onClick={handleDownload}
-            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-bg-3 hover:bg-bg-4 text-fg-1 px-4 py-2 rounded-md text-sm transition-colors"
           >
             Download
           </button>
           {onExecute && (
             <button
               onClick={handleExecute}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+              className="btn-deploy text-sm"
             >
               Execute Now
             </button>
           )}
           <button
             onClick={onClose}
-            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-bg-3 hover:bg-bg-4 text-fg-1 px-4 py-2 rounded-md text-sm transition-colors"
           >
             Close
           </button>
@@ -86,3 +88,4 @@ export function ManifestModal({ manifest, isOpen, onClose, onExecute }: Manifest
     </div>
   );
 }
+
