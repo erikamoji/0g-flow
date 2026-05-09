@@ -3,39 +3,49 @@
 import { Handle, Position } from 'reactflow';
 
 export function AnchorNode({ data }: { data: any }) {
+  const status = data.status || 'idle';
+  const name = data.name || '0G Storage · Anchor';
+  const nodeId = (data.nodeId || 'AN·02') + ' · 0G STORAGE';
+
   return (
-    <div className="bg-gradient-to-br from-emerald-900 to-emerald-950 text-white rounded-lg p-4 shadow-xl border-2 border-emerald-400 w-72">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-xl">📌</span>
-        <div className="text-sm font-bold">Anchor</div>
-        <span className="ml-auto text-xs bg-emerald-700 px-2 py-1 rounded">DB</span>
-      </div>
-
-      <div className="space-y-3">
-        <div>
-          <label className="text-xs text-gray-300 font-semibold block mb-1">
-            Storage Key
-          </label>
-          <input
-            type="text"
-            className="w-full bg-emerald-800 text-white text-xs p-2 rounded border border-emerald-600 focus:outline-none"
-            defaultValue={data.key || 'agent_state_log'}
-            placeholder="e.g., agent_state_log"
-          />
+    <div className={`node node-anchor ${data.selected ? 'selected' : ''}`} style={{ width: 260 }}>
+      <div className="node-head">
+        <Handle type="target" position={Position.Left} id="input" style={{ background: 'var(--bg-3)', border: '2px solid var(--anchor-300)', width: 12, height: 12, borderRadius: 9999 }} />
+        <div className="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <ellipse cx="12" cy="5" rx="8" ry="3" />
+            <path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5" />
+            <path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
+          </svg>
         </div>
-
-        <div>
-          <label className="text-xs text-gray-300 font-semibold block mb-1">
-            Persistence Level
-          </label>
-          <select className="w-full bg-emerald-800 text-white text-xs p-2 rounded border border-emerald-600 focus:outline-none">
-            <option>Standard</option>
-            <option>Permanent</option>
-          </select>
+        <div className="title">
+          <span className="name">{name}</span>
+          <span className="id">{nodeId}</span>
+        </div>
+        <span className={`status status-${status}`} />
+      </div>
+      <div className="node-body">
+        <div className="node-row">
+          <span className="l">Bucket</span>
+          <span className="v emerald">{data.bucket || 'flow / receipts'}</span>
+        </div>
+        <div className="node-row">
+          <span className="l">Hash</span>
+          <span className="v">keccak256</span>
+        </div>
+        <div className="node-row">
+          <span className="l">Anchor</span>
+          <span className="v">on-chain · galileo</span>
+        </div>
+        <div className="node-row">
+          <span className="l">Replicas</span>
+          <span className="v">3 / 3 confirmed</span>
         </div>
       </div>
-
-      <Handle type="input" position={Position.Left} className="bg-emerald-400" />
+      <div className="node-foot">
+        <span className="meta">LAST TX</span>
+        <span className="v tx">{data.lastTx || '0x4f3a…b27c'}</span>
+      </div>
     </div>
   );
 }
