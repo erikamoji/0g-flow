@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { Indexer, MemData } from '@0glabs/0g-ts-sdk';
+import { ethers } from 'ethers';
 import { Manifest } from './manifestCompiler';
 import { ExecutionLogger } from './executionLogger';
 import { resolveParametersObject } from './variableResolver';
@@ -144,18 +146,33 @@ class ManifestExecutor {
 
       this.logger.log('debug', `Anchoring to 0G Storage with key: ${key}`, { payload: resolvedPayload });
 
-      // Simulate storage anchor - in production, use @0glabs/0g-ts-sdk
-      const simulatedHash = `0x${Buffer.from(JSON.stringify(resolvedPayload)).toString('hex').substring(0, 64)}`;
+      const evmRpc = process.env.OG_RPC_URL || 'https://evmrpc-testnet.0g.ai';
+      const indexerRpc = process.env.OG_STORAGE_INDEXER || 'https://indexer-storage-testnet-turbo.0g.ai';
+      const privateKey = process.env.PRIVATE_KEY;
+
+      if (!privateKey) {
+        throw new Error('PRIVATE_KEY env var required for storage_anchor nodes');
+      }
+
+      const provider = new ethers.JsonRpcProvider(evmRpc);
+      const signer = new ethers.Wallet(privateKey, provider);
+      const indexer = new Indexer(indexerRpc);
+
+      const data = new MemData(Buffer.from(JSON.stringify(resolvedPayload)));
+      const [uploaded, uploadErr] = await indexer.upload(data, evmRpc, signer as any);
+      if (uploadErr !== null) throw new Error(`0G Storage upload failed: ${uploadErr}`);
 
       const result = {
         key: key,
-        transactionHash: simulatedHash,
+        transactionHash: uploaded.txHash,
+        rootHash: uploaded.rootHash,
         payload: resolvedPayload,
         timestamp: new Date().toISOString(),
         network: 'og-testnet',
+        explorer: `https://storagescan-newton.0g.ai/tx/${uploaded.txHash}`,
       };
 
-      this.logger.nodeSuccess(nodeId, node.type, result, simulatedHash);
+      this.logger.nodeSuccess(nodeId, node.type, result, uploaded.txHash);
       this.successCount++;
       return result;
     } catch (error: any) {
