@@ -1,7 +1,6 @@
 'use client';
 
-import { Indexer, MemData } from '@0glabs/0g-ts-sdk';
-import { BrowserProvider, JsonRpcSigner } from 'ethers';
+import type { BrowserProvider, JsonRpcSigner } from 'ethers';
 import type { WalletClient } from 'viem';
 
 export interface PendingAnchor {
@@ -22,12 +21,10 @@ export interface AnchorResult {
   network: string;
 }
 
-function walletClientToSigner(walletClient: WalletClient): JsonRpcSigner {
+async function walletClientToSigner(walletClient: WalletClient): Promise<JsonRpcSigner> {
+  const { BrowserProvider, JsonRpcSigner } = await import('ethers');
   const { account, chain, transport } = walletClient;
-  const network = {
-    chainId: chain!.id,
-    name: chain!.name,
-  };
+  const network = { chainId: chain!.id, name: chain!.name };
   const provider = new BrowserProvider(transport as any, network);
   return new JsonRpcSigner(provider, account!.address);
 }
@@ -36,10 +33,12 @@ export async function uploadPendingAnchors(
   pendingAnchors: PendingAnchor[],
   walletClient: WalletClient
 ): Promise<AnchorResult[]> {
+  const { Indexer, MemData } = await import('@0glabs/0g-ts-sdk');
+
   const evmRpc = process.env.NEXT_PUBLIC_OG_RPC_URL || 'https://evmrpc-testnet.0g.ai';
   const indexerRpc = process.env.NEXT_PUBLIC_OG_STORAGE_INDEXER || 'https://indexer-storage-testnet-turbo.0g.ai';
 
-  const signer = walletClientToSigner(walletClient);
+  const signer = await walletClientToSigner(walletClient);
   const indexer = new Indexer(indexerRpc);
   const results: AnchorResult[] = [];
 

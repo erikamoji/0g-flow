@@ -147,7 +147,27 @@ function LandingPage() {
         .lp-hero-glow::before { content: ""; position: absolute; width: 600px; height: 600px; border-radius: 50%; filter: blur(100px); opacity: 0.30; background: radial-gradient(circle, var(--input-glow), var(--logic-glow)); left: 50%; top: 50%; transform: translate(-50%, -50%); }
         .lp-hero-inner { text-align: center; max-width: 860px; position: relative; display: flex; flex-direction: column; align-items: center; gap: 0; }
         .lp-hero-sub { color: var(--fg-3); margin: 24px auto 0; max-width: 480px; font-size: 17px; line-height: 1.6; }
-        .lp-scroll-arrow { margin-top: 56px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--fg-4); cursor: pointer; background: none; border: none; padding: 0; animation: lp-bounce 2.2s ease-in-out infinite; }
+        /* HERO TERMINAL */
+        .lp-hero-terminal { margin-top: 40px; width: 100%; max-width: 560px; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; box-shadow: 0 24px 60px -12px rgba(0,0,0,0.5), 0 0 40px -16px rgba(42,123,255,0.15); text-align: left; }
+        .lp-ht-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line-2); background: var(--bg-2); }
+        .lp-ht-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .lp-ht-label { margin-left: auto; font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-4); }
+        .lp-ht-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; }
+        .lp-ht-line { display: flex; align-items: baseline; gap: 10px; font-family: var(--font-jetbrains-mono, monospace); font-size: 12px; color: var(--fg-2); opacity: 0; }
+        .lp-ht-ts { color: var(--fg-4); font-size: 10.5px; min-width: 72px; flex-shrink: 0; }
+        .lp-ht-info { color: var(--input-300); font-size: 10px; flex-shrink: 0; }
+        .lp-ht-success { color: var(--anchor-300); font-size: 10px; flex-shrink: 0; }
+        .lp-ht-ok { color: var(--anchor-300); }
+        .lp-ht-tx { color: var(--input-300); }
+        .lp-ht-l1 { animation: lp-ht-fade 0.3s ease forwards 0.4s; }
+        .lp-ht-l2 { animation: lp-ht-fade 0.3s ease forwards 0.8s; }
+        .lp-ht-l3 { animation: lp-ht-fade 0.3s ease forwards 1.1s; }
+        .lp-ht-l4 { animation: lp-ht-fade 0.3s ease forwards 1.9s; }
+        .lp-ht-l5 { animation: lp-ht-fade 0.3s ease forwards 2.1s; }
+        .lp-ht-l6 { animation: lp-ht-fade 0.3s ease forwards 2.6s; }
+        .lp-ht-l7 { animation: lp-ht-fade 0.3s ease forwards 2.9s; }
+        @keyframes lp-ht-fade { to { opacity: 1; } }
+        .lp-scroll-arrow { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--fg-4); cursor: pointer; background: none; border: none; padding: 0; animation: lp-bounce 2.2s ease-in-out infinite; }
         .lp-scroll-arrow svg { width: 20px; height: 20px; }
         @keyframes lp-bounce { 0%, 100% { transform: translateY(0); } 55% { transform: translateY(8px); } }
         /* REVEALS */
@@ -272,9 +292,9 @@ function LandingPage() {
           <img src="/flow-wordmark.svg" alt="0G Flow" style={{ height: 26 }} />
         </a>
         <div className="lp-nav-links">
-          <a href="#lp-compose">Compose</a>
-          <a href="#lp-deploy">Deploy</a>
-          <a href="#lp-anchor">Anchor</a>
+          <a href="#lp-compose">Build</a>
+          <a href="#lp-deploy">Run</a>
+          <a href="#lp-anchor">Verify</a>
         </div>
         <ConnectButton.Custom>
           {({ account, chain, openConnectModal, openAccountModal, mounted }) => {
@@ -299,8 +319,20 @@ function LandingPage() {
           <div className="lp-hero-grid" />
           <div className="lp-hero-glow" />
           <div className="lp-hero-inner lp-reveal">
-            <h1 className="lp-h1">Compose decentralized AI,<br /><span className="lp-grad" style={{ fontStyle: 'italic' }}>visually.</span></h1>
-            <p className="lp-hero-sub">Triggers, sealed inferences, on-chain anchors. One signed manifest. No servers.</p>
+            <h1 className="lp-h1">AI workflows that run on 0G —<br /><span className="lp-grad" style={{ fontStyle: 'italic' }}>and leave proof.</span></h1>
+            <p className="lp-hero-sub">Drag nodes, connect them, hit deploy. Your AI runs on 0G Compute and stores results on-chain — every execution gets a real tx hash you can verify.</p>
+            <div className="lp-hero-terminal">
+              <div className="lp-ht-bar"><span className="lp-ht-dot" style={{background:'#FF5F57'}} /><span className="lp-ht-dot" style={{background:'#FFBD2E'}} /><span className="lp-ht-dot" style={{background:'#28C840'}} /><span className="lp-ht-label">execution log</span></div>
+              <div className="lp-ht-body">
+                <div className="lp-ht-line lp-ht-l1"><span className="lp-ht-ts">00:00.000</span><span className="lp-ht-info">▶</span><span>workflow started · run-7k2m</span></div>
+                <div className="lp-ht-line lp-ht-l2"><span className="lp-ht-ts">00:00.041</span><span className="lp-ht-info">◆</span><span>data_input resolved · <span className="lp-ht-ok">✓</span></span></div>
+                <div className="lp-ht-line lp-ht-l3"><span className="lp-ht-ts">00:00.120</span><span className="lp-ht-info">◆</span><span>0G Compute · qwen2.5-7b-instruct</span></div>
+                <div className="lp-ht-line lp-ht-l4"><span className="lp-ht-ts">00:01.847</span><span className="lp-ht-info">◆</span><span>inference complete · <span className="lp-ht-ok">✓</span></span></div>
+                <div className="lp-ht-line lp-ht-l5"><span className="lp-ht-ts">00:01.902</span><span className="lp-ht-info">◆</span><span>signing storage upload…</span></div>
+                <div className="lp-ht-line lp-ht-l6"><span className="lp-ht-ts">00:02.391</span><span className="lp-ht-info">◆</span><span>anchored · tx <span className="lp-ht-tx">0x4f3a…b27c</span> <span className="lp-ht-ok">✓</span></span></div>
+                <div className="lp-ht-line lp-ht-l7"><span className="lp-ht-ts">00:02.401</span><span className="lp-ht-success">■</span><span><span className="lp-ht-ok">workflow complete</span> · 2 nodes · 2.40s</span></div>
+              </div>
+            </div>
             <button className="lp-scroll-arrow" onClick={() => document.getElementById('lp-compose')?.scrollIntoView({ behavior: 'smooth' })} aria-label="Scroll down">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
             </button>
@@ -310,9 +342,9 @@ function LandingPage() {
         {/* COMPOSE */}
         <section id="lp-compose" className="lp-section">
           <div className="lp-sect-head lp-reveal">
-            <span className="lp-eyebrow">01 · Compose</span>
-            <h2 className="lp-h2">Three primitives. <span className="lp-grad">Infinite graphs.</span></h2>
-            <p className="lp-lede">Three node types. Connect them by intent.</p>
+            <span className="lp-eyebrow">01 · Build</span>
+            <h2 className="lp-h2">Drag, connect, <span className="lp-grad">done.</span></h2>
+            <p className="lp-lede">Three node types cover everything: where data comes from, what AI does with it, and where the result lives forever.</p>
           </div>
           <div className="lp-nodes-grid lp-reveal-stagger">
             <div className="lp-archetype lp-input">
@@ -320,26 +352,26 @@ function LandingPage() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="14" height="12" rx="2" /><path d="M17 12h4M19 10l2 2-2 2" /></svg>
               </div>
               <div className="lp-a-eyebrow">Input</div>
-              <h3>Trigger anything.</h3>
-              <p>Webhook, schedule, or manual JSON. Signed at the edge.</p>
+              <h3>Your data, any shape.</h3>
+              <p>Feed in JSON from any source — an API, a wallet event, or your own payload. This is where the workflow begins.</p>
               <div className="lp-a-meta"><span className="lp-tag">JSON</span><span className="lp-tag">CRON</span><span className="lp-tag">WEBHOOK</span></div>
             </div>
             <div className="lp-archetype lp-logic">
               <div className="lp-a-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M3 12h3M18 12h3M12 3v3M12 18v3" /></svg>
               </div>
-              <div className="lp-a-eyebrow">Logic</div>
-              <h3>Sealed inference.</h3>
-              <p>Run models on 0G Compute. Attested in a TEE.</p>
+              <div className="lp-a-eyebrow">AI Compute</div>
+              <h3>Run models on 0G.</h3>
+              <p>Send your data to Qwen, GLM-4, or any model on 0G Compute. Real inference, no external servers.</p>
               <div className="lp-a-meta"><span className="lp-tag">QWEN 2.5</span><span className="lp-tag">GLM-4</span><span className="lp-tag">SEALED</span></div>
             </div>
             <div className="lp-archetype lp-anchor">
               <div className="lp-a-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v16" /><circle cx="12" cy="6" r="2" /><path d="M5 13c0 4 3 7 7 7s7-3 7-7" /></svg>
               </div>
-              <div className="lp-a-eyebrow">Anchor</div>
-              <h3>On-chain by default.</h3>
-              <p>Output hash committed to Galileo. Verifiable forever.</p>
+              <div className="lp-a-eyebrow">Storage</div>
+              <h3>Stored. Permanent. Yours.</h3>
+              <p>Your wallet signs the upload. The result lives on 0G Storage with a tx hash anyone can verify on the explorer.</p>
               <div className="lp-a-meta"><span className="lp-tag">KECCAK256</span><span className="lp-tag">3 / 3 REPLICAS</span></div>
             </div>
           </div>
@@ -348,9 +380,9 @@ function LandingPage() {
         {/* DEPLOY */}
         <section id="lp-deploy" className="lp-section">
           <div className="lp-sect-head lp-reveal">
-            <span className="lp-eyebrow">02 · Deploy</span>
-            <h2 className="lp-h2">One button. <span className="lp-grad">Runs everywhere.</span></h2>
-            <p className="lp-lede">Your graph compiles to a signed manifest. The 0G runtime takes it from there.</p>
+            <span className="lp-eyebrow">02 · Run</span>
+            <h2 className="lp-h2">Hit deploy. <span className="lp-grad">Watch it execute.</span></h2>
+            <p className="lp-lede">Your graph compiles to a portable manifest. The execution terminal streams live logs as each node runs — inference, then on-chain storage.</p>
           </div>
           <div className="lp-canvas-demo lp-reveal" ref={canvasRef}>
             <svg className="lp-demo-edges">
@@ -403,9 +435,9 @@ function LandingPage() {
           <div className="lp-receipt-row">
             <div className="lp-reveal">
               <div className="lp-sect-head" style={{ marginBottom: 0 }}>
-                <span className="lp-eyebrow">03 · Anchor</span>
-                <h2 className="lp-h2">Receipts <span className="lp-grad">on-chain.</span></h2>
-                <p className="lp-lede">Every run produces a signed, immutable receipt. Hash, block, attestation — permanent.</p>
+                <span className="lp-eyebrow">03 · Verify</span>
+                <h2 className="lp-h2">Every run has <span className="lp-grad">a receipt.</span></h2>
+                <p className="lp-lede">Each execution produces a real transaction hash. Paste it into the 0G explorer — the result, timestamp, and storage root are permanently on-chain.</p>
               </div>
             </div>
             <div className="lp-receipt lp-reveal">
@@ -455,16 +487,16 @@ function LandingPage() {
 
         {/* STATEMENT */}
         <section className="lp-statement lp-reveal">
-          <h2 className="lp-h2-stmt">Workflows that <span className="lp-grad" style={{ fontStyle: 'italic' }}>outlive</span><br />their authors.</h2>
+          <h2 className="lp-h2-stmt">Your AI doesn't just run —<br />it leaves <span className="lp-grad" style={{ fontStyle: 'italic' }}>proof.</span></h2>
           <div className="lp-verbs">
-            <span>COMPOSE</span><span className="lp-dot-sep">·</span><span>DEPLOY</span><span className="lp-dot-sep">·</span><span>ANCHOR</span>
+            <span>BUILD</span><span className="lp-dot-sep">·</span><span>RUN</span><span className="lp-dot-sep">·</span><span>VERIFY</span>
           </div>
         </section>
 
         {/* FINAL CTA */}
         <section className="lp-final">
           <div className="lp-final-inner lp-reveal">
-            <h2 className="lp-h2">Build something <span className="lp-grad">trustless.</span></h2>
+            <h2 className="lp-h2">Ready to ship something <span className="lp-grad">real?</span></h2>
             <WalletButton />
           </div>
         </section>
