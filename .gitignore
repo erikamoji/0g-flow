@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local dev artifacts
+.claude/
+CLAUDE.md
+lib/node-stub.js
+public/zgstorage.umd.js
+test-results/
