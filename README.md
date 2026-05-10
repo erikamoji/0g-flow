@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 0G Flow
 
-## Getting Started
+Visual workflow builder for decentralized AI on the [0G network](https://0g.ai). Drag nodes onto a canvas, wire them together, and deploy a signed manifest that runs inference on 0G Compute and anchors results to 0G Storage — all on-chain.
 
-First, run the development server:
+## What it does
+
+- **Drag-and-drop canvas** — build workflows from three node types: data input, AI compute, storage anchor
+- **Real 0G Compute** — inference calls go to the 0G Router API (Qwen, GLM, etc.)
+- **Real 0G Storage** — outputs are uploaded via `@0glabs/0g-ts-sdk` and produce verifiable tx hashes on 0G Galileo Testnet
+- **Manifest format** — every workflow compiles to a portable JSON spec you can download, share, or re-execute locally
+
+## Quick start
 
 ```bash
+npm install
+cp .env.example .env.local   # fill in your keys
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000), connect your wallet (0G Galileo Testnet, chain ID 16600), and start building.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `PRIVATE_KEY` | yes (for storage) | — | Wallet key used to sign 0G Storage uploads |
+| `OG_RPC_URL` | no | `https://evmrpc-testnet.0g.ai` | 0G EVM RPC endpoint |
+| `OG_STORAGE_INDEXER` | no | `https://indexer-storage-testnet-turbo.0g.ai` | 0G Storage indexer |
+| `OG_ROUTER_API` | no | `https://router-api.0g.ai/v1` | 0G Compute router |
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | no | `demo-project-id` | WalletConnect project ID |
 
-## Learn More
+> Storage anchor nodes will fail without `PRIVATE_KEY`. The wallet needs a small testnet balance for gas. Get testnet tokens at [faucet.0g.ai](https://faucet.0g.ai).
 
-To learn more about Next.js, take a look at the following resources:
+## Node types
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Node | What it does |
+|---|---|
+| **Data Input** | Provides a JSON payload as the workflow trigger |
+| **AI Compute** | Sends data to 0G Compute for model inference |
+| **Storage Anchor** | Uploads the result to 0G Storage; returns a real `txHash` + `rootHash` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Reference upstream outputs with `{{nodeId.output.field}}` in any parameter.
 
-## Deploy on Vercel
+## Run a manifest locally
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run execute manifests/example-vm0048.json
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Requires `.env` with `PRIVATE_KEY` and `OG_RPC_URL`. See [EXECUTOR.md](./EXECUTOR.md) for full docs.
+
+## Stack
+
+- Next.js 16 + React 19
+- ReactFlow (canvas)
+- RainbowKit + Wagmi (wallet)
+- `@0glabs/0g-ts-sdk` (storage)
+- Tailwind v4
+
+## Verifying on-chain
+
+After a workflow runs, each storage anchor node logs an `explorer` URL pointing to `storagescan-newton.0g.ai`. Paste the `txHash` into the explorer to confirm the upload.
