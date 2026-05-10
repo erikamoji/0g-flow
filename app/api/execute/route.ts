@@ -18,11 +18,16 @@ export async function POST(request: NextRequest) {
     const logger = new ExecutionLogger();
     const result = await executeManifest(manifest, logger);
 
+    const pendingAnchors = Object.values(result.results).filter(
+      (r: any) => r?.__pending === true
+    );
+
     return NextResponse.json({
       success: result.success,
       workflowId: result.workflowId,
       logs: result.logs,
       results: result.results,
+      pendingAnchors,
       error: result.error,
     });
   } catch (error: any) {

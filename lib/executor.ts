@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { Indexer, MemData } from '@0glabs/0g-ts-sdk';
-import { ethers } from 'ethers';
 import { Manifest } from './manifestCompiler';
 import { ExecutionLogger } from './executionLogger';
 import { resolveParametersObject } from './variableResolver';
@@ -144,35 +142,18 @@ class ManifestExecutor {
       const { key, payload } = resolvedParams;
       const resolvedPayload = typeof payload === 'string' ? JSON.parse(payload) : payload;
 
-      this.logger.log('debug', `Anchoring to 0G Storage with key: ${key}`, { payload: resolvedPayload });
+      this.logger.log('debug', `Queuing storage anchor for client-side signing: ${key}`, { payload: resolvedPayload });
 
-      const evmRpc = process.env.OG_RPC_URL || 'https://evmrpc-testnet.0g.ai';
-      const indexerRpc = process.env.OG_STORAGE_INDEXER || 'https://indexer-storage-testnet-turbo.0g.ai';
-      const privateKey = process.env.PRIVATE_KEY;
-
-      if (!privateKey) {
-        throw new Error('PRIVATE_KEY env var required for storage_anchor nodes');
-      }
-
-      const provider = new ethers.JsonRpcProvider(evmRpc);
-      const signer = new ethers.Wallet(privateKey, provider);
-      const indexer = new Indexer(indexerRpc);
-
-      const data = new MemData(Buffer.from(JSON.stringify(resolvedPayload)));
-      const [uploaded, uploadErr] = await indexer.upload(data, evmRpc, signer as any);
-      if (uploadErr !== null) throw new Error(`0G Storage upload failed: ${uploadErr}`);
-
+      // Upload is deferred to the browser wallet — server returns pending state
       const result = {
-        key: key,
-        transactionHash: uploaded.txHash,
-        rootHash: uploaded.rootHash,
+        __pending: true,
+        nodeId,
+        key,
         payload: resolvedPayload,
         timestamp: new Date().toISOString(),
-        network: 'og-testnet',
-        explorer: `https://storagescan-newton.0g.ai/tx/${uploaded.txHash}`,
       };
 
-      this.logger.nodeSuccess(nodeId, node.type, result, uploaded.txHash);
+      this.logger.log('info', `Storage anchor queued — waiting for wallet signature`, { nodeId, key });
       this.successCount++;
       return result;
     } catch (error: any) {

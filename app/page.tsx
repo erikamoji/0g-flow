@@ -2,8 +2,9 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Node, Edge } from 'reactflow';
-import { useAccount } from 'wagmi';
+import { useAccount, useWalletClient } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { uploadPendingAnchors, type PendingAnchor } from '@/lib/storageClient';
 import { Sidebar } from '@/components/Sidebar';
 import { Canvas } from '@/components/Canvas';
 import { ManifestModal } from '@/components/ManifestModal';
@@ -483,6 +484,7 @@ function LandingPage() {
 
 function Dashboard() {
   const { address } = useAccount();
+  const { data: walletClient } = useWalletClient();
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [manifest, setManifest] = useState<Manifest | null>(null);
@@ -508,9 +510,7 @@ function Dashboard() {
     try {
       const response = await fetch('/api/execute', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ manifest: manifestToExecute }),
       });
 
@@ -523,6 +523,40 @@ function Dashboard() {
 
       if (!result.success) {
         alert(`Workflow failed: ${result.error}`);
+        return;
+      }
+
+      const pendingAnchors: PendingAnchor[] = result.pendingAnchors || [];
+      if (pendingAnchors.length > 0) {
+        if (!walletClient) {
+          throw new Error('Wallet not connected — cannot sign storage uploads');
+        }
+
+        setLogs((prev) => [
+          ...prev,
+          {
+            id: `log_storage_start_${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            level: 'info' as const,
+            message: `Signing ${pendingAnchors.length} storage upload(s) with your wallet…`,
+          },
+        ]);
+
+        const anchorResults = await uploadPendingAnchors(pendingAnchors, walletClient);
+
+        setLogs((prev) => [
+          ...prev,
+          ...anchorResults.map((r) => ({
+            id: `log_anchor_${r.nodeId}_${Date.now()}`,
+            timestamp: r.timestamp,
+            level: 'success' as const,
+            nodeId: r.nodeId,
+            nodeType: 'storage_anchor',
+            message: `Anchored to 0G Storage — ${r.explorer}`,
+            transactionHash: r.transactionHash,
+            data: { rootHash: r.rootHash, key: r.key },
+          })),
+        ]);
       }
     } catch (error: any) {
       setLogs((prevLogs) => [
@@ -530,7 +564,7 @@ function Dashboard() {
         {
           id: `log_error_${Date.now()}`,
           timestamp: new Date().toISOString(),
-          level: 'error',
+          level: 'error' as const,
           message: `Execution error: ${error.message}`,
         },
       ]);
@@ -538,7 +572,7 @@ function Dashboard() {
     } finally {
       setIsExecuting(false);
     }
-  }, []);
+  }, [walletClient]);
 
   return (
     <div className="flex h-screen w-screen bg-bg-0">
