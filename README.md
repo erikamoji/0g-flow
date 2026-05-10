@@ -23,13 +23,13 @@ Open [http://localhost:3000](http://localhost:3000), connect your wallet (0G Gal
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `PRIVATE_KEY` | yes (for storage) | — | Wallet key used to sign 0G Storage uploads |
-| `OG_RPC_URL` | no | `https://evmrpc-testnet.0g.ai` | 0G EVM RPC endpoint |
-| `OG_STORAGE_INDEXER` | no | `https://indexer-storage-testnet-turbo.0g.ai` | 0G Storage indexer |
+| `OG_RPC_URL` | no | `https://evmrpc-testnet.0g.ai` | 0G EVM RPC (server — inference) |
 | `OG_ROUTER_API` | no | `https://router-api.0g.ai/v1` | 0G Compute router |
+| `NEXT_PUBLIC_OG_RPC_URL` | no | `https://evmrpc-testnet.0g.ai` | 0G EVM RPC (browser — storage) |
+| `NEXT_PUBLIC_OG_STORAGE_INDEXER` | no | `https://indexer-storage-testnet-turbo.0g.ai` | 0G Storage indexer |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | no | `demo-project-id` | WalletConnect project ID |
 
-> Storage anchor nodes will fail without `PRIVATE_KEY`. The wallet needs a small testnet balance for gas. Get testnet tokens at [faucet.0g.ai](https://faucet.0g.ai).
+No server private key needed. Storage anchor nodes are signed by the user's connected wallet — they pay their own gas.
 
 ## Node types
 
@@ -47,7 +47,7 @@ Reference upstream outputs with `{{nodeId.output.field}}` in any parameter.
 npm run execute manifests/example-vm0048.json
 ```
 
-Requires `.env` with `PRIVATE_KEY` and `OG_RPC_URL`. See [EXECUTOR.md](./EXECUTOR.md) for full docs.
+Requires `.env` with `OG_RPC_URL`. See [EXECUTOR.md](./EXECUTOR.md) for full docs.
 
 ## Stack
 
