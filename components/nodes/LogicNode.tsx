@@ -1,12 +1,31 @@
 'use client';
 
-import { Handle, Position } from 'reactflow';
+import { useState, useCallback } from 'react';
+import { Handle, Position, useReactFlow } from 'reactflow';
 
-export function LogicNode({ data }: { data: any }) {
+const MODELS = [
+  { value: 'glm-5', label: 'glm-5 · 744B' },
+  { value: 'deepseek-chat-v3', label: 'deepseek-v3' },
+  { value: 'qwen3-vl-30b', label: 'qwen3-vl-30b' },
+  { value: 'qwen2.5-7b-instruct', label: 'qwen2.5-7b' },
+];
+
+export function LogicNode({ id, data }: { id: string; data: any }) {
+  const { setNodes } = useReactFlow();
   const status = data.status || 'idle';
   const name = data.name || '0G Compute · Sealed';
-  const nodeId = (data.nodeId || 'LX·07') + ' · 0G COMPUTE';
+  const model = data.model || 'glm-5';
   const sealed = data.sealed !== false;
+  const instruction = data.instruction || '';
+
+  const [editingName, setEditingName] = useState(false);
+  const [editingInstruction, setEditingInstruction] = useState(false);
+
+  const update = useCallback((patch: Record<string, any>) => {
+    setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, ...patch } } : n));
+  }, [id, setNodes]);
+
+  const nodeId = (data.nodeId || 'LX·07') + ' · 0G COMPUTE';
 
   return (
     <div className={`node node-logic ${data.selected ? 'selected' : ''}`} style={{ width: 260 }}>
@@ -26,8 +45,19 @@ export function LogicNode({ data }: { data: any }) {
             <path d="M19 15h3" />
           </svg>
         </div>
-        <div className="title">
-          <span className="name">{name}</span>
+        <div className="title" style={{ flex: 1, minWidth: 0 }}>
+          {editingName ? (
+            <input
+              className="node-edit-name"
+              defaultValue={name}
+              autoFocus
+              onBlur={e => { update({ name: e.target.value || name }); setEditingName(false); }}
+              onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); if (e.key === 'Escape') setEditingName(false); }}
+              onClick={e => e.stopPropagation()}
+            />
+          ) : (
+            <span className="name node-editable" title="Double-click to rename" onDoubleClick={() => setEditingName(true)}>{name}</span>
+          )}
           <span className="id">{nodeId}</span>
         </div>
         <span className={`status status-${status}`} />
@@ -36,13 +66,25 @@ export function LogicNode({ data }: { data: any }) {
       <div className="node-body">
         <div className="node-row">
           <span className="l">Model</span>
-          <span className="v violet">{data.model || 'qwen2.5-7b'}</span>
+          <select
+            className="node-edit-select"
+            value={model}
+            onChange={e => update({ model: e.target.value })}
+            onClick={e => e.stopPropagation()}
+            style={{ color: 'var(--logic-300)' }}
+          >
+            {MODELS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+          </select>
         </div>
         <div className="node-row">
           <span className="l">Provider</span>
           <span className="v">0g-compute · galileo</span>
         </div>
-        <div className="toggle-row">
+        <div
+          className="toggle-row"
+          style={{ cursor: 'pointer', userSelect: 'none' }}
+          onClick={e => { e.stopPropagation(); update({ sealed: !sealed }); }}
+        >
           <div className="l">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--logic-300)' }}>
               <rect x="5" y="11" width="14" height="10" rx="2" />
@@ -52,6 +94,27 @@ export function LogicNode({ data }: { data: any }) {
           </div>
           <span className={`toggle ${sealed ? 'on' : ''}`} />
         </div>
+        {editingInstruction ? (
+          <textarea
+            className="node-edit-textarea"
+            defaultValue={instruction}
+            placeholder="System instruction…"
+            autoFocus
+            rows={3}
+            onBlur={e => { update({ instruction: e.target.value }); setEditingInstruction(false); }}
+            onKeyDown={e => { if (e.key === 'Escape') setEditingInstruction(false); }}
+            onClick={e => e.stopPropagation()}
+          />
+        ) : (
+          <div
+            className="node-pre node-editable"
+            title="Click to edit instruction"
+            onClick={() => setEditingInstruction(true)}
+            style={{ fontSize: 11, color: instruction ? 'var(--fg-2)' : 'var(--fg-4)', minHeight: 36 }}
+          >
+            {instruction || 'click to add instruction…'}
+          </div>
+        )}
         <div className="node-row">
           <span className="l">Temp</span>
           <span className="v">0.7 · max 512 tok</span>
@@ -59,7 +122,7 @@ export function LogicNode({ data }: { data: any }) {
       </div>
       <div className="node-foot">
         <span className="meta">PROOF</span>
-        <span className="v">tee · attested</span>
+        <span className="v">tee · {sealed ? 'attested' : 'unverified'}</span>
       </div>
     </div>
   );

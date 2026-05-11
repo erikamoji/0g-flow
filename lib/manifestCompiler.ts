@@ -25,24 +25,24 @@ export function compileManifest(
 ): Manifest {
   const manifestNodes: ManifestNode[] = nodes.map((node) => {
     const baseParams: Record<string, any> = {};
+    const d = node.data || {};
 
     if (node.type === 'data_input') {
-      baseParams.raw_json = '{"request_id": "1001", "content": "Sample data"}';
+      baseParams.raw_json = d.payload || '{"request_id": "1001", "content": "Sample data"}';
+      baseParams.source = d.source || 'manual';
     } else if (node.type === 'ai_compute') {
-      baseParams.model = 'qwen-2.5-7b-instruct';
-      baseParams.instruction = 'Analyze the input data and provide a structured summary.';
-      baseParams.verifiable_execution = false;
+      baseParams.model = d.model || 'glm-5';
+      baseParams.instruction = d.instruction || 'Analyze the input data and provide a structured summary.';
+      baseParams.sealed = d.sealed !== false;
 
-      // Find the input node that feeds into this one
       const inputEdge = edges.find((e) => e.target === node.id);
       if (inputEdge) {
         baseParams.data_source = `{{${inputEdge.source}.output}}`;
       }
     } else if (node.type === 'storage_anchor') {
-      baseParams.key = 'agent_state_log';
+      baseParams.key = d.bucket || 'agent_state_log';
       baseParams.persistence_level = 'Standard';
 
-      // Find the logic node that feeds into this one
       const logicEdge = edges.find((e) => e.target === node.id);
       if (logicEdge) {
         baseParams.payload = `{{${logicEdge.source}.output}}`;
