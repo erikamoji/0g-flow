@@ -262,7 +262,7 @@ function LandingPage() {
         .lp-receipt-status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ok-500); box-shadow: 0 0 6px var(--ok-glow); }
         @keyframes lp-receipt-glow { 0%, 100% { box-shadow: 0 0 0 rgba(52,211,153,0); } 50% { box-shadow: 0 0 16px rgba(52,211,153,0.18); } }
         /* STATEMENT */
-        .lp-statement { text-align: center; padding: 160px 32px; max-width: 1200px; margin: 0 auto; }
+        .lp-statement { text-align: center; padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
         .lp-statement .lp-h2-stmt { font-size: clamp(36px, 5.5vw, 76px); font-weight: 600; line-height: 1.05; letter-spacing: -0.025em; font-family: var(--font-inter-tight, sans-serif); }
         .lp-verbs { display: inline-flex; gap: 20px; margin-top: 40px; flex-wrap: wrap; justify-content: center; font-family: var(--font-jetbrains-mono, monospace); font-size: 10.5px; font-weight: 500; letter-spacing: 0.20em; text-transform: uppercase; color: var(--fg-3); }
         .lp-verbs span:nth-child(1) { color: var(--input-300); }
@@ -447,7 +447,7 @@ function LandingPage() {
             <div className="lp-receipt lp-reveal">
               <div className="lp-receipt-header">
                 <div className="lp-receipt-store">0G Flow</div>
-                <div className="lp-receipt-sub">Galileo Testnet · Execution Receipt</div>
+                <div className="lp-receipt-sub">0G Testnet · Execution Receipt</div>
               </div>
               <div className="lp-receipt-body">
                 <div className="lp-receipt-row-item">
@@ -501,7 +501,20 @@ function LandingPage() {
         <section className="lp-final">
           <div className="lp-final-inner lp-reveal">
             <h2 className="lp-h2">Ready to ship something <span className="lp-grad">real?</span></h2>
-            <WalletButton />
+            <ConnectButton.Custom>
+              {({ account, openConnectModal, mounted }) => {
+                if (!mounted) return null;
+                if (!account) return (
+                  <button className="lp-wallet-btn" onClick={openConnectModal}>Connect wallet</button>
+                );
+                return (
+                  <button className="lp-wallet-btn connected" onClick={() => {}}>
+                    <span className="lp-wallet-dot" />
+                    {account.displayName}
+                  </button>
+                );
+              }}
+            </ConnectButton.Custom>
           </div>
         </section>
 
