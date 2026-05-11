@@ -2,7 +2,7 @@
 
 import { NODE_TYPES, NodeType } from '@/lib/nodeTypes';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount, useDisconnect, useBalance } from 'wagmi';
+import { useAccount, useDisconnect } from 'wagmi';
 
 interface SidebarProps {
   nodeCount?: number;
@@ -12,7 +12,6 @@ interface SidebarProps {
 export function Sidebar({ nodeCount = 0, edgeCount = 0 }: SidebarProps) {
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const { data: balance } = useBalance({ address });
 
   const onDragStart = (
     event: React.DragEvent<HTMLDivElement>,
@@ -71,12 +70,6 @@ export function Sidebar({ nodeCount = 0, edgeCount = 0 }: SidebarProps) {
                 Connect wallet
               </button>
             );
-            const bal = balance ? `${parseFloat(balance.formatted).toFixed(4)} ${balance.symbol}` : '—';
-            const networkName = rkChain?.unsupported
-              ? 'WRONG NETWORK'
-              : rkChain?.name
-                ? (rkChain.name.toLowerCase().includes('testnet') ? rkChain.name : rkChain.name)
-                : 'UNKNOWN';
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {/* Row 1: address + disconnect */}
@@ -92,14 +85,6 @@ export function Sidebar({ nodeCount = 0, edgeCount = 0 }: SidebarProps) {
                       <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
                   </button>
-                </div>
-                {/* Row 2: balance + network */}
-                <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', padding: '0 2px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ color: 'var(--fg-2)', fontWeight: 500 }}>{bal}</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: rkChain?.unsupported ? 'var(--err-500)' : 'var(--ok-500)', background: rkChain?.unsupported ? 'rgba(244,113,116,0.08)' : 'rgba(52,211,153,0.08)', border: `1px solid ${rkChain?.unsupported ? 'rgba(244,113,116,0.25)' : 'rgba(52,211,153,0.2)'}`, borderRadius: 999, padding: '2px 7px', fontSize: 9, letterSpacing: '0.12em' }}>
-                    <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor', flexShrink: 0, display: 'inline-block' }} />
-                    {networkName}
-                  </span>
                 </div>
               </div>
             );
