@@ -1,8 +1,19 @@
 'use client';
 
 import { NODE_TYPES, NodeType } from '@/lib/nodeTypes';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount, useDisconnect, useBalance } from 'wagmi';
 
-export function Sidebar() {
+interface SidebarProps {
+  nodeCount?: number;
+  edgeCount?: number;
+}
+
+export function Sidebar({ nodeCount = 0, edgeCount = 0 }: SidebarProps) {
+  const { address } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { data: balance } = useBalance({ address });
+
   const onDragStart = (
     event: React.DragEvent<HTMLDivElement>,
     nodeType: NodeType
@@ -12,16 +23,19 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="sidebar" style={{ width: 280 }}>
+    <aside className="sidebar" style={{ width: 280, display: 'flex', flexDirection: 'column' }}>
       <div className="sidebar-section">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
           <h1 className="brand-wordmark" style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em', margin: 0 }}>0G Flow</h1>
-          <span className="hdr-net"><span className="dot" />GALILEO</span>
+          <span style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 9, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-4)', background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderRadius: 4, padding: '3px 6px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            {nodeCount}N · {edgeCount}E
+          </span>
         </div>
-        <p className="eyebrow" style={{ marginTop: 6 }}>Visual Agent Builder</p>
+        <div style={{ height: 2, marginTop: 10, borderRadius: 1, background: 'linear-gradient(90deg, var(--input-300) 0%, var(--logic-300) 50%, var(--anchor-300) 100%)', opacity: 0.5 }} />
+        <p className="eyebrow" style={{ marginTop: 8 }}>Visual Agent Builder</p>
       </div>
 
-      <div className="sidebar-section">
+      <div className="sidebar-section" style={{ flex: 1 }}>
         <div className="eyebrow">Node Palette</div>
         <div className="palette-list">
           {(Object.entries(NODE_TYPES) as Array<[NodeType, any]>).map(([key, config]) => {
@@ -48,13 +62,46 @@ export function Sidebar() {
         </div>
       </div>
 
-      <div className="sidebar-section">
-        <div className="eyebrow">How It Works</div>
-        <ol style={{ marginTop: 12, paddingLeft: 18, color: 'var(--fg-3)', fontSize: 12, lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <li><strong style={{ color: 'var(--fg-2)' }}>Input</strong> — define the data source</li>
-          <li><strong style={{ color: 'var(--fg-2)' }}>Logic</strong> — process with 0G AI compute</li>
-          <li><strong style={{ color: 'var(--fg-2)' }}>Anchor</strong> — persist to decentralized storage</li>
-        </ol>
+      <div className="sidebar-section" style={{ borderTop: '1px solid var(--line-2)', flexShrink: 0, flex: 'none' }}>
+        <ConnectButton.Custom>
+          {({ account, chain: rkChain, openConnectModal, mounted }) => {
+            if (!mounted) return null;
+            if (!account) return (
+              <button onClick={openConnectModal} style={{ width: '100%', fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-2)', padding: '7px 12px', borderRadius: 6, cursor: 'pointer', textAlign: 'left' }}>
+                Connect wallet
+              </button>
+            );
+            const bal = balance ? `${parseFloat(balance.formatted).toFixed(4)} ${balance.symbol}` : '—';
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-1)', padding: '7px 12px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ok-500)', boxShadow: '0 0 8px var(--ok-glow)', flexShrink: 0, display: 'inline-block' }} />
+                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{account.displayName}</span>
+                </div>
+                <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'var(--fg-3)', padding: '0 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>{bal}</span>
+                  <span className="hdr-net" style={{ fontSize: 10 }}>
+                    <span className="dot" style={{ background: rkChain?.unsupported ? 'var(--err-500)' : undefined }} />
+                    {rkChain?.name
+                      ? (rkChain.name.toLowerCase().includes('testnet') ? rkChain.name : rkChain.name + ' MAINNET')
+                      : 'UNKNOWN NETWORK'}
+                  </span>
+                </div>
+                <div style={{ padding: '0 4px', display: 'flex', justifyContent: 'flex-end' }}>
+                  <button onClick={() => disconnect()} title="Disconnect" style={{ background: 'none', border: 'none', color: 'var(--fg-4)', cursor: 'pointer', padding: 2, lineHeight: 0, borderRadius: 4, transition: 'color 150ms' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--err-500)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-4)')}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            );
+          }}
+        </ConnectButton.Custom>
       </div>
     </aside>
   );
