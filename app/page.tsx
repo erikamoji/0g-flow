@@ -52,7 +52,7 @@ function LandingPage() {
       for (const e of entries) {
         if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
       }
-    }, { threshold: 0.18, rootMargin: '0px 0px -10% 0px' });
+    }, { threshold: 0.12, rootMargin: '0px 0px -4% 0px' });
     document.querySelectorAll('.lp-reveal, .lp-reveal-stagger').forEach(el => io.observe(el));
     return () => io.disconnect();
   }, []);
@@ -171,12 +171,16 @@ function LandingPage() {
         .lp-scroll-arrow svg { width: 20px; height: 20px; }
         @keyframes lp-bounce { 0%, 100% { transform: translateY(0); } 55% { transform: translateY(8px); } }
         /* REVEALS */
-        .lp-reveal { opacity: 0; transform: translateY(20px); transition: opacity 650ms cubic-bezier(0.2,0.8,0.2,1), transform 650ms cubic-bezier(0.2,0.8,0.2,1); }
-        .lp-reveal.in { opacity: 1; transform: none; }
-        .lp-reveal-stagger > * { opacity: 0; transform: translateY(18px); transition: opacity 600ms cubic-bezier(0.2,0.8,0.2,1), transform 600ms cubic-bezier(0.2,0.8,0.2,1); }
+        .lp-reveal { opacity: 0; transform: translateY(20px); transition: opacity 650ms cubic-bezier(0.2,0.8,0.2,1), transform 650ms cubic-bezier(0.2,0.8,0.2,1); will-change: opacity, transform; }
+        .lp-reveal.in { opacity: 1; transform: none; will-change: auto; }
+        .lp-reveal-stagger > * { opacity: 0; transform: translateY(18px); transition: opacity 600ms cubic-bezier(0.2,0.8,0.2,1), transform 600ms cubic-bezier(0.2,0.8,0.2,1); will-change: opacity, transform; }
+        .lp-reveal-stagger.in > * { will-change: auto; }
         .lp-reveal-stagger.in > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0ms; }
         .lp-reveal-stagger.in > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 120ms; }
         .lp-reveal-stagger.in > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 240ms; }
+        .lp-reveal-stagger.in > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 360ms; }
+        .lp-reveal-stagger.in > *:nth-child(5) { opacity: 1; transform: none; transition-delay: 480ms; }
+        .lp-reveal-stagger.in > *:nth-child(6) { opacity: 1; transform: none; transition-delay: 600ms; }
         /* SECTION HEADS */
         .lp-sect-head { display: flex; flex-direction: column; gap: 18px; max-width: 680px; margin-bottom: 64px; }
         /* ARCHETYPE CARDS */
@@ -319,8 +323,8 @@ function LandingPage() {
           <div className="lp-hero-grid" />
           <div className="lp-hero-glow" />
           <div className="lp-hero-inner lp-reveal">
-            <h1 className="lp-h1">AI workflows that run on 0G —<br /><span className="lp-grad" style={{ fontStyle: 'italic' }}>and leave proof.</span></h1>
-            <p className="lp-hero-sub">Drag nodes, connect them, hit deploy. Your AI runs on 0G Compute and stores results on-chain — every execution gets a real tx hash you can verify.</p>
+            <h1 className="lp-h1">Drag, connect, deploy —<br /><span className="lp-grad" style={{ fontStyle: 'italic' }}>and leave proof.</span></h1>
+            <p className="lp-hero-sub">Your AI runs on 0G Compute and stores results on-chain — every execution gets a real tx hash you can verify.</p>
             <div className="lp-hero-terminal">
               <div className="lp-ht-bar"><span className="lp-ht-dot" style={{background:'#FF5F57'}} /><span className="lp-ht-dot" style={{background:'#FFBD2E'}} /><span className="lp-ht-dot" style={{background:'#28C840'}} /><span className="lp-ht-label">execution log</span></div>
               <div className="lp-ht-body">
@@ -343,7 +347,7 @@ function LandingPage() {
         <section id="lp-compose" className="lp-section">
           <div className="lp-sect-head lp-reveal">
             <span className="lp-eyebrow">01 · Build</span>
-            <h2 className="lp-h2">Drag, connect, <span className="lp-grad">done.</span></h2>
+            <h2 className="lp-h2">AI workflows that <span className="lp-grad">run on 0G.</span></h2>
             <p className="lp-lede">Three node types cover everything: where data comes from, what AI does with it, and where the result lives forever.</p>
           </div>
           <div className="lp-nodes-grid lp-reveal-stagger">
@@ -361,9 +365,9 @@ function LandingPage() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M3 12h3M18 12h3M12 3v3M12 18v3" /></svg>
               </div>
               <div className="lp-a-eyebrow">AI Compute</div>
-              <h3>Run models on 0G.</h3>
-              <p>Send your data to Qwen, GLM-4, or any model on 0G Compute. Real inference, no external servers.</p>
-              <div className="lp-a-meta"><span className="lp-tag">QWEN 2.5</span><span className="lp-tag">GLM-4</span><span className="lp-tag">SEALED</span></div>
+              <h3>Inference, sealed.</h3>
+              <p>GLM-5, DeepSeek v3, Qwen3-VL on mainnet. Qwen 2.5 and GLM-4 on Galileo testnet. Real inference — no external servers, no trust assumptions.</p>
+              <div className="lp-a-meta"><span className="lp-tag">GLM-5</span><span className="lp-tag">DEEPSEEK V3</span><span className="lp-tag">QWEN</span><span className="lp-tag">SEALED</span></div>
             </div>
             <div className="lp-archetype lp-anchor">
               <div className="lp-a-icon">
@@ -514,6 +518,8 @@ function LandingPage() {
   );
 }
 
+const STORAGE_KEY = 'og-flow-workflow';
+
 function Dashboard() {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -523,6 +529,37 @@ function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [logs, setLogs] = useState<ExecutionLog[]>([]);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [workflowName, setWorkflowName] = useState('Untitled');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [savedName, setSavedName] = useState('');
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const { name, nodes: n, edges: e } = JSON.parse(saved);
+        if (name) setWorkflowName(name);
+        if (n) setNodes(n);
+        if (e) setEdges(e);
+      }
+    } catch {}
+  }, []);
+
+  const handleSave = useCallback(() => {
+    const data = { name: workflowName, nodes, edges };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    setSavedName(workflowName);
+    setTimeout(() => setSavedName(''), 1800);
+  }, [workflowName, nodes, edges]);
+
+  const commitName = useCallback(() => {
+    setIsEditingName(false);
+  }, []);
+
+  useEffect(() => {
+    if (isEditingName) nameInputRef.current?.select();
+  }, [isEditingName]);
 
   const handleDeploy = useCallback(() => {
     if (nodes.length === 0) {
@@ -608,24 +645,29 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen w-screen bg-bg-0">
-      <Sidebar />
+      <Sidebar nodeCount={nodes.length} edgeCount={edges.length} />
       <div className="flex-1 flex flex-col">
         <header style={{ height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 0 20px', background: 'var(--bg-1)', borderBottom: '1px solid var(--line-2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <h1 className="brand-wordmark" style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', margin: 0 }}>0G Flow</h1>
-            </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-3)' }}>
               <span>WORKFLOWS</span>
               <span style={{ color: 'var(--fg-4)' }}>/</span>
-              <span style={{ color: 'var(--fg-1)' }}>Untitled</span>
+              {isEditingName ? (
+                <input
+                  ref={nameInputRef}
+                  value={workflowName}
+                  onChange={(e) => setWorkflowName(e.target.value)}
+                  onBlur={commitName}
+                  onKeyDown={(e) => { if (e.key === 'Enter') commitName(); }}
+                  style={{ color: 'var(--fg-1)', background: 'transparent', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit', width: Math.max(60, workflowName.length * 8) }}
+                />
+              ) : (
+                <span style={{ color: 'var(--fg-1)', cursor: 'text' }} onClick={() => setIsEditingName(true)}>{workflowName}</span>
+              )}
             </div>
-            <span className="hdr-net"><span className="dot" />GALILEO TESTNET</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span className="eyebrow">{nodes.length} NODES · {edges.length} EDGES</span>
-            <WalletButton />
-            <button
+<button
               onClick={handleDeploy}
               disabled={isExecuting}
               className={`btn-deploy ${isExecuting ? 'is-running' : 'is-pulsing'}`}
@@ -638,6 +680,7 @@ function Dashboard() {
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <Canvas onNodesChange={setNodes} onEdgesChange={setEdges} isRunning={isExecuting} />
+
           <Drawer logs={logs} manifest={manifest} isRunning={isExecuting} />
         </div>
 

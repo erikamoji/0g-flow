@@ -11,7 +11,7 @@ interface DrawerProps {
 }
 
 export function Drawer({ logs, manifest, isRunning }: DrawerProps) {
-  const [tab, setTab] = useState<'receipt' | 'logs' | 'json' | 'trace'>('logs');
+  const [tab, setTab] = useState<'receipt' | 'logs' | 'json'>('logs');
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -19,7 +19,7 @@ export function Drawer({ logs, manifest, isRunning }: DrawerProps) {
       <button aria-label="Toggle drawer" className="drawer-handle" onClick={() => setCollapsed(c => !c)} style={{ border: 0, padding: 0 }} />
       <div className="drawer-head">
         <div className="drawer-tabs">
-          {(['receipt', 'logs', 'json', 'trace'] as const).map(t => (
+          {(['receipt', 'logs', 'json'] as const).map(t => (
             <button key={t} className={`drawer-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
               {t[0].toUpperCase() + t.slice(1)}
             </button>
@@ -176,11 +176,6 @@ export function Drawer({ logs, manifest, isRunning }: DrawerProps) {
               </pre>
             )}
 
-            {tab === 'trace' && (
-              <div className="eyebrow" style={{ padding: 12 }}>
-                Trace view coming soon — sealed-inference attestations will render here.
-              </div>
-            )}
           </div>
         </div>
       )}
