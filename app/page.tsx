@@ -15,8 +15,34 @@ import { ExecutionLog } from '@/lib/executionLogger';
 import { registerWorkflow, recordExecution } from '@/lib/registry';
 import { getNetwork } from '@/lib/networks';
 
+const OG_CHAINS = [
+  {
+    chainId: '0x40da', // 16602
+    chainName: '0G Galileo Testnet',
+    nativeCurrency: { name: '0G Token', symbol: 'A0G', decimals: 18 },
+    rpcUrls: ['https://evmrpc-testnet.0g.ai'],
+    blockExplorerUrls: ['https://explorer.0g.ai'],
+  },
+  {
+    chainId: '0x4115', // 16661
+    chainName: '0G Aristotle Mainnet',
+    nativeCurrency: { name: '0G Token', symbol: 'A0G', decimals: 18 },
+    rpcUrls: ['https://evmrpc.0g.ai'],
+    blockExplorerUrls: ['https://explorer.0g.ai'],
+  },
+];
+
 export default function Home() {
   const { isConnected } = useAccount();
+
+  // Pre-register 0G chains in MetaMask on app load so chain-switch never fails
+  useEffect(() => {
+    if (typeof window === 'undefined' || !(window as any).ethereum) return;
+    for (const chain of OG_CHAINS) {
+      (window as any).ethereum.request({ method: 'wallet_addEthereumChain', params: [chain] })
+        .catch(() => {});
+    }
+  }, []);
 
   if (!isConnected) {
     return <LandingPage />;
@@ -625,30 +651,6 @@ function Dashboard() {
   const { data: walletClient } = useWalletClient();
   const chainId = useChainId();
 
-  // Ensure 0G chains are registered in MetaMask on first connect
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.ethereum) return;
-    const chainsToAdd = [
-      {
-        chainId: '0x40da', // 16602
-        chainName: '0G Galileo Testnet',
-        nativeCurrency: { name: '0G Token', symbol: 'A0G', decimals: 18 },
-        rpcUrls: ['https://evmrpc-testnet.0g.ai'],
-        blockExplorerUrls: ['https://explorer.0g.ai'],
-      },
-      {
-        chainId: '0x4105', // 16661
-        chainName: '0G Aristotle Mainnet',
-        nativeCurrency: { name: '0G Token', symbol: 'A0G', decimals: 18 },
-        rpcUrls: ['https://evmrpc.0g.ai'],
-        blockExplorerUrls: ['https://explorer.0g.ai'],
-      },
-    ];
-    for (const chain of chainsToAdd) {
-      (window.ethereum as any).request({ method: 'wallet_addEthereumChain', params: [chain] })
-        .catch(() => {});
-    }
-  }, [address]);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [manifest, setManifest] = useState<Manifest | null>(null);
