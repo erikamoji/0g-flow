@@ -1,7 +1,6 @@
 import { createWalletClient, createPublicClient, custom, http, keccak256, toBytes } from 'viem';
-import { og0Testnet } from './chains';
-
-export const REGISTRY_ADDRESS = (process.env.NEXT_PUBLIC_REGISTRY_ADDRESS ?? '') as `0x${string}`;
+import { og0Testnet, og0Mainnet } from './chains';
+import { getNetwork } from './networks';
 
 const ABI = [
   {
@@ -28,44 +27,53 @@ const ABI = [
   },
 ] as const;
 
-function walletClient() {
+function chainById(chainId: number) {
+  return chainId === 16661 ? og0Mainnet : og0Testnet;
+}
+
+function walletClient(chainId: number) {
   if (typeof window === 'undefined' || !window.ethereum) throw new Error('No wallet');
-  return createWalletClient({ chain: og0Testnet, transport: custom(window.ethereum) });
+  return createWalletClient({ chain: chainById(chainId), transport: custom(window.ethereum) });
 }
 
 export async function registerWorkflow(
+  chainId: number,
   workflowId: string,
   manifestJson: string,
   storageKey: string
 ): Promise<`0x${string}`> {
-  const client = walletClient();
+  const network = getNetwork(chainId);
+  if (!network.registryAddress) throw new Error('Registry not deployed on this network');
+  const client = walletClient(chainId);
   const [address] = await client.getAddresses();
   const manifestHash = keccak256(toBytes(manifestJson)) as `0x${string}`;
 
   return client.writeContract({
-    address: REGISTRY_ADDRESS,
+    address: network.registryAddress,
     abi: ABI,
     functionName: 'registerWorkflow',
-    args: [workflowId, manifestHash as `0x${string}`, storageKey],
+    args: [workflowId, manifestHash, storageKey],
     account: address,
   });
 }
 
 export async function recordExecution(
+  chainId: number,
   workflowId: string,
   executionTxHash: string,
   storageTxHash: string
 ): Promise<`0x${string}`> {
-  const client = walletClient();
+  const network = getNetwork(chainId);
+  if (!network.registryAddress) throw new Error('Registry not deployed on this network');
+  const client = walletClient(chainId);
   const [address] = await client.getAddresses();
 
-  // pad executionTxHash to bytes32
   const execHash = (executionTxHash.startsWith('0x')
     ? executionTxHash.padEnd(66, '0')
     : `0x${executionTxHash.padEnd(64, '0')}`) as `0x${string}`;
 
   return client.writeContract({
-    address: REGISTRY_ADDRESS,
+    address: network.registryAddress,
     abi: ABI,
     functionName: 'recordExecution',
     args: [workflowId, execHash, storageTxHash],

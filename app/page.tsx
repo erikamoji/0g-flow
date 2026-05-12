@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Node, Edge } from 'reactflow';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useAccount, useWalletClient, useChainId } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { uploadPendingAnchors, type PendingAnchor } from '@/lib/storageClient';
 import { Sidebar } from '@/components/Sidebar';
@@ -12,7 +12,8 @@ import { Drawer } from '@/components/Drawer';
 import { WalletButton } from '@/components/WalletButton';
 import { compileManifest, Manifest } from '@/lib/manifestCompiler';
 import { ExecutionLog } from '@/lib/executionLogger';
-import { registerWorkflow, recordExecution, REGISTRY_ADDRESS } from '@/lib/registry';
+import { registerWorkflow, recordExecution } from '@/lib/registry';
+import { getNetwork } from '@/lib/networks';
 
 export default function Home() {
   const { isConnected } = useAccount();
@@ -622,6 +623,32 @@ const STORAGE_KEY = 'og-flow-workflow';
 function Dashboard() {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const chainId = useChainId();
+
+  // Ensure 0G chains are registered in MetaMask on first connect
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.ethereum) return;
+    const chainsToAdd = [
+      {
+        chainId: '0x40da', // 16602
+        chainName: '0G Galileo Testnet',
+        nativeCurrency: { name: '0G Token', symbol: 'A0G', decimals: 18 },
+        rpcUrls: ['https://evmrpc-testnet.0g.ai'],
+        blockExplorerUrls: ['https://explorer.0g.ai'],
+      },
+      {
+        chainId: '0x4105', // 16661
+        chainName: '0G Aristotle Mainnet',
+        nativeCurrency: { name: '0G Token', symbol: 'A0G', decimals: 18 },
+        rpcUrls: ['https://evmrpc.0g.ai'],
+        blockExplorerUrls: ['https://explorer.0g.ai'],
+      },
+    ];
+    for (const chain of chainsToAdd) {
+      (window.ethereum as any).request({ method: 'wallet_addEthereumChain', params: [chain] })
+        .catch(() => {});
+    }
+  }, [address]);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [manifest, setManifest] = useState<Manifest | null>(null);
@@ -670,9 +697,9 @@ function Dashboard() {
     setManifest(compiled);
     setIsModalOpen(true);
 
-    // Register workflow on-chain if contract is deployed
-    if (REGISTRY_ADDRESS) {
-      registerWorkflow(compiled.workflow_id, JSON.stringify(compiled), compiled.workflow_id)
+    // Register workflow on-chain if contract is deployed on this network
+    if (getNetwork(chainId).registryAddress) {
+      registerWorkflow(chainId, compiled.workflow_id, JSON.stringify(compiled), compiled.workflow_id)
         .catch(() => {/* non-blocking — deploy continues even if registry call fails */});
     }
   }, [nodes, edges, address]);
@@ -716,7 +743,7 @@ function Dashboard() {
           },
         ]);
 
-        const anchorResults = await uploadPendingAnchors(pendingAnchors, walletClient);
+        const anchorResults = await uploadPendingAnchors(pendingAnchors, walletClient, chainId);
 
         setLogs((prev) => [
           ...prev,
@@ -733,9 +760,19 @@ function Dashboard() {
         ]);
 
         // Record execution on-chain for each anchor result
-        if (REGISTRY_ADDRESS && manifestToExecute) {
+        if (getNetwork(chainId).registryAddress && manifestToExecute) {
           for (const r of anchorResults) {
-            recordExecution(manifestToExecute.workflow_id, r.transactionHash || '', r.key || '')
+            recordExecution(chainId, manifestToExecute.workflow_id, r.transactionHash || '', r.key || '')
+              .then((registryTxHash) => {
+                setLogs((prev) => [...prev, {
+                  id: `log_registry_${r.nodeId}_${Date.now()}`,
+                  timestamp: new Date().toISOString(),
+                  level: 'success' as const,
+                  nodeId: r.nodeId,
+                  message: `Execution recorded on-chain — https://explorer.0g.ai/tx/${registryTxHash}`,
+                  transactionHash: registryTxHash,
+                }]);
+              })
               .catch(() => {});
           }
         }

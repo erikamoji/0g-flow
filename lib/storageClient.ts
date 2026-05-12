@@ -31,12 +31,15 @@ async function walletClientToSigner(walletClient: WalletClient): Promise<JsonRpc
 
 export async function uploadPendingAnchors(
   pendingAnchors: PendingAnchor[],
-  walletClient: WalletClient
+  walletClient: WalletClient,
+  chainId: number = 16600
 ): Promise<AnchorResult[]> {
   const { Indexer, MemData } = await import('@0glabs/0g-ts-sdk');
+  const { getNetwork } = await import('./networks');
 
-  const evmRpc = process.env.NEXT_PUBLIC_OG_RPC_URL || 'https://evmrpc-testnet.0g.ai';
-  const indexerRpc = process.env.NEXT_PUBLIC_OG_STORAGE_INDEXER || 'https://indexer-storage-testnet-turbo.0g.ai';
+  const network = getNetwork(chainId);
+  const evmRpc = process.env.NEXT_PUBLIC_OG_RPC_URL || network.rpc;
+  const indexerRpc = network.storageIndexer;
 
   const signer = await walletClientToSigner(walletClient);
   const indexer = new Indexer(indexerRpc);
@@ -52,10 +55,10 @@ export async function uploadPendingAnchors(
       key: anchor.key,
       transactionHash: uploaded.txHash,
       rootHash: uploaded.rootHash,
-      explorer: `https://storagescan-newton.0g.ai/tx/${uploaded.txHash}`,
+      explorer: `${network.storageExplorer}/tx/${uploaded.txHash}`,
       payload: anchor.payload,
       timestamp: new Date().toISOString(),
-      network: 'og-testnet',
+      network: network.name,
     });
   }
 

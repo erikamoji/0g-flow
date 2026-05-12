@@ -28,8 +28,62 @@ const edgeTypesMap = {
   gradient: GradientEdge,
 };
 
-const initialNodes: Node[] = [];
-const initialEdges: Edge[] = [];
+const initialNodes: Node[] = [
+  {
+    id: 'input-demo',
+    type: 'data_input',
+    position: { x: 80, y: 180 },
+    data: {
+      name: 'Market Data Feed',
+      source: 'manual',
+      nodeId: 'IN·01',
+      payload: '{\n  "asset": "BTC",\n  "price": 67420,\n  "volume_24h": 38291043200\n}',
+    },
+  },
+  {
+    id: 'logic-demo',
+    type: 'ai_compute',
+    position: { x: 420, y: 180 },
+    data: {
+      name: 'Signal Analyzer',
+      model: 'deepseek-chat-v3',
+      sealed: true,
+      nodeId: 'LX·01',
+      instruction: 'Analyze the market data. Return BUY, SELL, or HOLD with a confidence score 0–100.',
+    },
+  },
+  {
+    id: 'anchor-demo',
+    type: 'storage_anchor',
+    position: { x: 760, y: 180 },
+    data: {
+      name: 'Store Analysis',
+      bucket: 'defi / signals',
+      nodeId: 'AN·01',
+    },
+  },
+];
+
+const initialEdges: Edge[] = [
+  {
+    id: 'e-demo-1',
+    source: 'input-demo',
+    sourceHandle: 'output',
+    target: 'logic-demo',
+    targetHandle: 'input',
+    type: 'gradient',
+    data: { isRunning: false },
+  },
+  {
+    id: 'e-demo-2',
+    source: 'logic-demo',
+    sourceHandle: 'output',
+    target: 'anchor-demo',
+    targetHandle: 'input',
+    type: 'gradient',
+    data: { isRunning: false },
+  },
+];
 
 interface CanvasProps {
   onNodesChange?: (nodes: Node[]) => void;
