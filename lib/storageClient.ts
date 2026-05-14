@@ -34,7 +34,7 @@ export async function uploadPendingAnchors(
   walletClient: WalletClient,
   chainId: number = 16602
 ): Promise<AnchorResult[]> {
-  const { Indexer, MemData } = await import('@0glabs/0g-ts-sdk');
+  const { Indexer, MemData } = await import('@0gfoundation/0g-ts-sdk');
   const { getNetwork } = await import('./networks');
 
   const network = getNetwork(chainId);
@@ -47,8 +47,11 @@ export async function uploadPendingAnchors(
 
   for (const anchor of pendingAnchors) {
     const data = new MemData(Buffer.from(JSON.stringify(anchor.payload)));
+    const [, treeErr] = await data.merkleTree();
+    if (treeErr !== null) throw new Error(`Merkle tree error for ${anchor.key}: ${treeErr}`);
     const [uploaded, err] = await indexer.upload(data, evmRpc, signer as any);
     if (err !== null) throw new Error(`Storage upload failed for ${anchor.key}: ${err}`);
+    if (!uploaded || !('txHash' in uploaded)) throw new Error(`Unexpected batch upload result for ${anchor.key}`);
 
     results.push({
       nodeId: anchor.nodeId,
