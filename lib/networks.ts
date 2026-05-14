@@ -14,7 +14,7 @@ export const NETWORKS: Record<number, NetworkConfig> = {
     storageIndexer: 'https://indexer-storage-testnet-turbo.0g.ai',
     storageExplorer: 'https://storagescan-galileo.0g.ai',
     registryAddress: (process.env.NEXT_PUBLIC_REGISTRY_ADDRESS_16602 ?? '') as `0x${string}`,
-    models: ['Qwen2.5-7B-Instruct', 'GLM-4-9B-Chat'],
+    models: ['zai-org/GLM-5-FP8', 'deepseek/deepseek-chat-v3-0324', 'qwen/qwen3-vl-30b-a3b-instruct'],
   },
   16661: {
     name: '0G Aristotle Mainnet',
@@ -22,7 +22,7 @@ export const NETWORKS: Record<number, NetworkConfig> = {
     storageIndexer: 'https://indexer-storage-turbo.0g.ai',
     storageExplorer: 'https://storagescan.0g.ai',
     registryAddress: (process.env.NEXT_PUBLIC_REGISTRY_ADDRESS_16661 ?? '') as `0x${string}`,
-    models: ['glm-5', 'deepseek-chat-v3', 'Qwen3-VL-30B'],
+    models: ['zai-org/GLM-5.1-FP8', 'deepseek-v4-pro', '0GM-1.0-35B-A3B', 'qwen/qwen3-vl-30b-a3b-instruct'],
   },
 };
 

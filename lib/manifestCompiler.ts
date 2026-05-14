@@ -31,7 +31,7 @@ export function compileManifest(
       baseParams.raw_json = d.payload || '{"request_id": "1001", "content": "Sample data"}';
       baseParams.source = d.source || 'manual';
     } else if (node.type === 'ai_compute') {
-      baseParams.model = d.model || 'glm-5';
+      baseParams.model = d.model || 'zai-org/GLM-5-FP8';
       baseParams.instruction = d.instruction || 'Analyze the input data and provide a structured summary.';
       baseParams.sealed = d.sealed !== false;
 

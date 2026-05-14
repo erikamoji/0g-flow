@@ -2,19 +2,16 @@
 
 import { useState, useCallback } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
-
-const MODELS = [
-  { value: 'glm-5', label: 'glm-5 · 744B' },
-  { value: 'deepseek-chat-v3', label: 'deepseek-v3' },
-  { value: 'qwen3-vl-30b', label: 'qwen3-vl-30b' },
-  { value: 'qwen2.5-7b-instruct', label: 'qwen2.5-7b' },
-];
+import { useChainId } from 'wagmi';
+import { getNetwork } from '@/lib/networks';
 
 export function LogicNode({ id, data }: { id: string; data: any }) {
   const { setNodes } = useReactFlow();
+  const chainId = useChainId();
+  const models = getNetwork(chainId).models;
   const status = data.status || 'idle';
   const name = data.name || '0G Compute · Sealed';
-  const model = data.model || 'glm-5';
+  const model = data.model || models[0];
   const sealed = data.sealed !== false;
   const instruction = data.instruction || '';
 
@@ -73,7 +70,7 @@ export function LogicNode({ id, data }: { id: string; data: any }) {
             onClick={e => e.stopPropagation()}
             style={{ color: 'var(--logic-300)' }}
           >
-            {MODELS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+            {models.map(m => <option key={m} value={m}>{m.split('/').pop()}</option>)}
           </select>
         </div>
         <div className="node-row">

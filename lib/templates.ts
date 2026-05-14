@@ -36,7 +36,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         id: 'tpl-compute-1',
         type: 'ai_compute',
         position: { x: 420, y: 200 },
-        data: { model: 'glm-4', instruction: 'Summarize the input text into 2-3 concise sentences.', sealed: true },
+        data: { model: 'zai-org/GLM-5-FP8', instruction: 'Summarize the input text into 2-3 concise sentences.', sealed: true },
       },
       {
         id: 'tpl-anchor-1',
@@ -66,7 +66,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         id: 'tpl-compute-2',
         type: 'ai_compute',
         position: { x: 420, y: 200 },
-        data: { model: 'glm-4', instruction: 'Analyze the input and extract key facts as structured JSON.', sealed: true },
+        data: { model: 'zai-org/GLM-5-FP8', instruction: 'Analyze the input and extract key facts as structured JSON.', sealed: true },
       },
       {
         id: 'tpl-memory-w',
@@ -96,7 +96,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         id: 'tpl-compute-3',
         type: 'ai_compute',
         position: { x: 420, y: 200 },
-        data: { model: 'glm-4', instruction: 'Using the retrieved memory context, generate a concise report.', sealed: true },
+        data: { model: 'zai-org/GLM-5-FP8', instruction: 'Using the retrieved memory context, generate a concise report.', sealed: true },
       },
       {
         id: 'tpl-anchor-3',
