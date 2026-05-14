@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import { useChainId } from 'wagmi';
 import { getNetwork } from '@/lib/networks';
@@ -21,6 +21,12 @@ export function LogicNode({ id, data }: { id: string; data: any }) {
   const update = useCallback((patch: Record<string, any>) => {
     setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, ...patch } } : n));
   }, [id, setNodes]);
+
+  useEffect(() => {
+    if (!models.includes(data.model)) {
+      update({ model: models[0] });
+    }
+  }, [chainId]);
 
   const nodeId = (data.nodeId || 'LX·07') + ' · 0G COMPUTE';
 
@@ -75,7 +81,7 @@ export function LogicNode({ id, data }: { id: string; data: any }) {
         </div>
         <div className="node-row">
           <span className="l">Provider</span>
-          <span className="v">0g-compute · galileo</span>
+          <span className="v">0g-compute · {chainId === 16661 ? 'mainnet' : 'galileo'}</span>
         </div>
         <div
           className="toggle-row"
