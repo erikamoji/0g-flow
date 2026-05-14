@@ -47,6 +47,18 @@ export function compileManifest(
       if (logicEdge) {
         baseParams.payload = `{{${logicEdge.source}.output}}`;
       }
+    } else if (node.type === 'memory_store') {
+      baseParams.mode = d.mode || 'write';
+      baseParams.key = d.memKey || 'agent_memory';
+
+      if (baseParams.mode === 'write') {
+        const inputEdge = edges.find((e) => e.target === node.id);
+        if (inputEdge) {
+          baseParams.payload = `{{${inputEdge.source}.output}}`;
+        }
+      } else {
+        baseParams.root_hash = d.rootHash || '';
+      }
     }
 
     return {

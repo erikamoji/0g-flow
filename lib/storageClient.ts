@@ -32,7 +32,7 @@ async function walletClientToSigner(walletClient: WalletClient): Promise<JsonRpc
 export async function uploadPendingAnchors(
   pendingAnchors: PendingAnchor[],
   walletClient: WalletClient,
-  chainId: number = 16600
+  chainId: number = 16602
 ): Promise<AnchorResult[]> {
   const { Indexer, MemData } = await import('@0glabs/0g-ts-sdk');
   const { getNetwork } = await import('./networks');

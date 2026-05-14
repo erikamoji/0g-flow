@@ -14,6 +14,7 @@ import { compileManifest, Manifest } from '@/lib/manifestCompiler';
 import { ExecutionLog } from '@/lib/executionLogger';
 import { registerWorkflow, recordExecution } from '@/lib/registry';
 import { getNetwork } from '@/lib/networks';
+import { WorkflowTemplate, WORKFLOW_TEMPLATES } from '@/lib/templates';
 
 const OG_CHAINS = [
   {
@@ -645,6 +646,15 @@ function LandingPage() {
 }
 
 const STORAGE_KEY = 'og-flow-workflow';
+const RUNS_KEY = 'og-flow-runs';
+
+interface RecentRun {
+  id: string;
+  timestamp: string;
+  workflowName: string;
+  success: boolean;
+  logCount: number;
+}
 
 function Dashboard() {
   const { address } = useAccount();
@@ -660,7 +670,11 @@ function Dashboard() {
   const [workflowName, setWorkflowName] = useState('Untitled');
   const [isEditingName, setIsEditingName] = useState(false);
   const [savedName, setSavedName] = useState('');
+  const [recentRuns, setRecentRuns] = useState<RecentRun[]>([]);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const [templateNodes, setTemplateNodes] = useState<Node[] | null>(null);
+  const [templateEdges, setTemplateEdges] = useState<Edge[] | null>(null);
+  const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -671,6 +685,13 @@ function Dashboard() {
         if (n) setNodes(n);
         if (e) setEdges(e);
       }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(RUNS_KEY);
+      if (saved) setRecentRuns(JSON.parse(saved));
     } catch {}
   }, []);
 
@@ -688,6 +709,13 @@ function Dashboard() {
   useEffect(() => {
     if (isEditingName) nameInputRef.current?.select();
   }, [isEditingName]);
+
+  const loadTemplate = useCallback((t: WorkflowTemplate) => {
+    setTemplateNodes([...t.nodes]);
+    setTemplateEdges([...t.edges]);
+    setWorkflowName(t.name);
+    setIsTemplatePickerOpen(false);
+  }, []);
 
   const handleDeploy = useCallback(() => {
     if (nodes.length === 0) {
@@ -723,6 +751,19 @@ function Dashboard() {
 
       const result = await response.json();
       setLogs(result.logs || []);
+
+      const newRun: RecentRun = {
+        id: manifestToExecute.workflow_id,
+        timestamp: new Date().toISOString(),
+        workflowName,
+        success: !!result.success,
+        logCount: (result.logs || []).length,
+      };
+      setRecentRuns(prev => {
+        const next = [newRun, ...prev].slice(0, 5);
+        localStorage.setItem(RUNS_KEY, JSON.stringify(next));
+        return next;
+      });
 
       if (!result.success) {
         alert(`Workflow failed: ${result.error}`);
@@ -797,7 +838,7 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen w-screen bg-bg-0">
-      <Sidebar nodeCount={nodes.length} edgeCount={edges.length} />
+      <Sidebar nodeCount={nodes.length} edgeCount={edges.length} recentRuns={recentRuns} />
       <div className="flex-1 flex flex-col">
         <header style={{ height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 0 20px', background: 'var(--bg-1)', borderBottom: '1px solid var(--line-2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, minWidth: 0 }}>
@@ -819,7 +860,13 @@ function Dashboard() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-<button
+            <button
+              onClick={() => setIsTemplatePickerOpen(true)}
+              style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-3)', padding: '6px 12px', borderRadius: 6, cursor: 'pointer' }}
+            >
+              Templates
+            </button>
+            <button
               onClick={handleDeploy}
               disabled={isExecuting}
               className={`btn-deploy ${isExecuting ? 'is-running' : 'is-pulsing'}`}
@@ -831,9 +878,9 @@ function Dashboard() {
         </header>
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Canvas onNodesChange={setNodes} onEdgesChange={setEdges} isRunning={isExecuting} />
+          <Canvas onNodesChange={setNodes} onEdgesChange={setEdges} isRunning={isExecuting} externalNodes={templateNodes} externalEdges={templateEdges} />
 
-          <Drawer logs={logs} manifest={manifest} isRunning={isExecuting} />
+          <Drawer logs={logs} manifest={manifest} isRunning={isExecuting} nodeCount={nodes.length} edgeCount={edges.length} />
         </div>
 
         <ManifestModal
@@ -842,6 +889,54 @@ function Dashboard() {
           onClose={() => setIsModalOpen(false)}
           onExecute={handleExecuteManifest}
         />
+
+        {isTemplatePickerOpen && (
+          <div
+            onClick={() => setIsTemplatePickerOpen(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}
+            onKeyDown={(e) => { if (e.key === 'Escape') setIsTemplatePickerOpen(false); }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{ background: 'var(--bg-1)', border: '1px solid var(--line-2)', borderRadius: 10, padding: 24, width: 520, maxWidth: '90vw', display: 'flex', flexDirection: 'column', gap: 12 }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--fg-4)' }}>Workflow Templates</span>
+                <button onClick={() => setIsTemplatePickerOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--fg-4)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 0 }}>×</button>
+              </div>
+              {WORKFLOW_TEMPLATES.map((t) => {
+                const dotColor: Record<string, string> = {
+                  data_input: 'var(--input-400)',
+                  ai_compute: 'var(--logic-400)',
+                  storage_anchor: 'var(--anchor-400)',
+                  memory_store: 'var(--memory-400, #22d3ee)',
+                };
+                return (
+                  <div key={t.id} style={{ background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderRadius: 7, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'var(--fg-1)', marginBottom: 4 }}>{t.name}</div>
+                      <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.06em', marginBottom: 8 }}>{t.description}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        {t.nodes.map((n, i) => (
+                          <React.Fragment key={n.id}>
+                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor[n.type || ''] || 'var(--fg-4)', display: 'inline-block', flexShrink: 0 }} title={n.type || ''} />
+                            {i < t.nodes.length - 1 && <span style={{ color: 'var(--fg-5, var(--fg-4))', fontSize: 9 }}>→</span>}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => loadTemplate(t)}
+                      style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-0, var(--bg-1))', border: '1px solid var(--line-2)', color: 'var(--fg-2)', padding: '6px 14px', borderRadius: 5, cursor: 'pointer', flexShrink: 0 }}
+                    >
+                      Load
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

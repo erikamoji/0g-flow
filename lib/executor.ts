@@ -16,6 +16,7 @@ export interface ExecutionResult {
 }
 
 const OG_ROUTER_API = 'https://router-api.0g.ai/v1';
+const OG_STORAGE_INDEXER = process.env.OG_STORAGE_INDEXER || 'https://indexer-storage-testnet-turbo.0g.ai';
 
 class ManifestExecutor {
   private manifest: Manifest;
@@ -108,6 +109,7 @@ class ManifestExecutor {
           timeout: 30000,
           headers: {
             'Content-Type': 'application/json',
+            ...(process.env.OG_ROUTER_API_KEY ? { 'Authorization': `Bearer ${process.env.OG_ROUTER_API_KEY}` } : {}),
           },
         }
       );
@@ -163,6 +165,57 @@ class ManifestExecutor {
     }
   }
 
+  private async executeMemoryStoreNode(nodeId: string): Promise<any> {
+    const node = this.manifest.nodes.find((n) => n.id === nodeId);
+    if (!node) throw new Error(`Node ${nodeId} not found`);
+
+    this.logger.nodeStart(nodeId, node.type, node.params);
+
+    try {
+      const { resolved: resolvedParams } = resolveParametersObject(node.params, this.context);
+      const { mode, key } = resolvedParams;
+
+      if (mode === 'read') {
+        const rootHash = resolvedParams.root_hash;
+        if (!rootHash) throw new Error('memory_store read mode requires root_hash');
+
+        this.logger.log('debug', `Fetching memory from 0G Storage: ${rootHash}`, { key });
+        const response = await axios.get(`${OG_STORAGE_INDEXER}/file`, {
+          params: { root: rootHash },
+          timeout: 15000,
+        });
+
+        const output = response.data;
+        this.logger.nodeSuccess(nodeId, node.type, { mode: 'read', key, rootHash, output });
+        this.successCount++;
+        return { mode: 'read', key, rootHash, output };
+      }
+
+      // write mode — deferred to browser wallet like storage_anchor
+      const resolvedPayload = typeof resolvedParams.payload === 'string'
+        ? JSON.parse(resolvedParams.payload)
+        : resolvedParams.payload;
+
+      this.logger.log('debug', `Queuing memory write for client-side signing: ${key}`, { payload: resolvedPayload });
+
+      const result = {
+        __pending: true,
+        nodeId,
+        key,
+        payload: resolvedPayload,
+        timestamp: new Date().toISOString(),
+      };
+
+      this.logger.log('info', `Memory write queued — waiting for wallet signature`, { nodeId, key });
+      this.successCount++;
+      return result;
+    } catch (error: any) {
+      this.logger.nodeError(nodeId, node.type, error.message);
+      this.failureCount++;
+      throw error;
+    }
+  }
+
   async execute(): Promise<ExecutionResult> {
     try {
       this.logger.workflowStart(this.manifest.workflow_id, `Workflow (${this.manifest.owner})`);
@@ -183,6 +236,9 @@ class ManifestExecutor {
             break;
           case 'storage_anchor':
             result = await this.executeStorageAnchorNode(nodeId);
+            break;
+          case 'memory_store':
+            result = await this.executeMemoryStoreNode(nodeId);
             break;
           default:
             throw new Error(`Unknown node type: ${node.type}`);

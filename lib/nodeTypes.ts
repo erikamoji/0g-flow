@@ -1,4 +1,4 @@
-export type NodeType = 'data_input' | 'ai_compute' | 'storage_anchor';
+export type NodeType = 'data_input' | 'ai_compute' | 'storage_anchor' | 'memory_store';
 
 export const NODE_TYPES = {
   data_input: {
@@ -18,5 +18,11 @@ export const NODE_TYPES = {
     description: 'Persist output to 0G storage',
     icon: '📌',
     color: 'border-emerald-400',
+  },
+  memory_store: {
+    label: 'Memory',
+    description: 'Read/write persistent memory via 0G Storage',
+    icon: '🧩',
+    color: 'border-cyan-400',
   },
 };
