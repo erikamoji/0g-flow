@@ -33,9 +33,11 @@ interface SidebarProps {
   nodeCount?: number;
   edgeCount?: number;
   recentRuns?: RecentRun[];
+  onSelectRun?: (id: string, timestamp: string) => void;
+  selectedRunKey?: string | null;
 }
 
-export function Sidebar({ recentRuns = [] }: SidebarProps) {
+export function Sidebar({ recentRuns = [], onSelectRun, selectedRunKey }: SidebarProps) {
   const { disconnect } = useDisconnect();
   const [paletteOpen, setPaletteOpen] = useState(true);
   const [runsOpen, setRunsOpen] = useState(true);
@@ -98,15 +100,25 @@ export function Sidebar({ recentRuns = [] }: SidebarProps) {
           recentRuns.length === 0 ? (
             <p style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-4)', margin: '6px 0 0', letterSpacing: '0.08em' }}>No runs yet</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
-              {recentRuns.map(run => (
-                <div key={run.id + run.timestamp} style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.08em', minWidth: 0 }}>
-                  <span style={{ width: 5, height: 5, borderRadius: '50%', flexShrink: 0, background: run.success ? 'var(--ok-500)' : 'var(--err-500)', boxShadow: run.success ? '0 0 5px var(--ok-glow)' : 'none' }} />
-                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--fg-2)' }}>{run.workflowName}</span>
-                  <span style={{ color: 'var(--fg-4)', flexShrink: 0 }}>{relTime(run.timestamp)}</span>
-                  <span style={{ background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderRadius: 3, padding: '1px 5px', color: 'var(--fg-4)', flexShrink: 0 }}>{run.logCount}</span>
-                </div>
-              ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 6 }}>
+              {recentRuns.map(run => {
+                const key = run.id + run.timestamp;
+                const isSelected = selectedRunKey === key;
+                return (
+                  <div
+                    key={key}
+                    onClick={() => onSelectRun?.(run.id, run.timestamp)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.08em', minWidth: 0, cursor: onSelectRun ? 'pointer' : 'default', padding: '3px 5px', margin: '0 -5px', borderRadius: 4, background: isSelected ? 'var(--bg-2)' : 'transparent', border: isSelected ? '1px solid var(--line-2)' : '1px solid transparent', transition: 'background 120ms, border-color 120ms' }}
+                    onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-2)'; }}
+                    onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
+                  >
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', flexShrink: 0, background: run.success ? 'var(--ok-500)' : 'var(--err-500)', boxShadow: run.success ? '0 0 5px var(--ok-glow)' : 'none' }} />
+                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isSelected ? 'var(--fg-1)' : 'var(--fg-2)' }}>{run.workflowName}</span>
+                    <span style={{ color: 'var(--fg-4)', flexShrink: 0 }}>{relTime(run.timestamp)}</span>
+                    <span style={{ background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderRadius: 3, padding: '1px 5px', color: 'var(--fg-4)', flexShrink: 0 }}>{run.logCount}</span>
+                  </div>
+                );
+              })}
             </div>
           )
         )}

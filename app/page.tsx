@@ -654,6 +654,8 @@ interface RecentRun {
   workflowName: string;
   success: boolean;
   logCount: number;
+  logs: ExecutionLog[];
+  manifest: Manifest | null;
 }
 
 function Dashboard() {
@@ -671,6 +673,7 @@ function Dashboard() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [savedName, setSavedName] = useState('');
   const [recentRuns, setRecentRuns] = useState<RecentRun[]>([]);
+  const [selectedRunKey, setSelectedRunKey] = useState<string | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const [templateNodes, setTemplateNodes] = useState<Node[] | null>(null);
   const [templateEdges, setTemplateEdges] = useState<Edge[] | null>(null);
@@ -691,7 +694,10 @@ function Dashboard() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem(RUNS_KEY);
-      if (saved) setRecentRuns(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setRecentRuns(parsed.map((r: any) => ({ logs: [], manifest: null, ...r })));
+      }
     } catch {}
   }, []);
 
@@ -717,6 +723,15 @@ function Dashboard() {
     setIsTemplatePickerOpen(false);
   }, []);
 
+  const onSelectRun = useCallback((id: string, timestamp: string) => {
+    if (isExecuting) return;
+    const run = recentRuns.find(r => r.id === id && r.timestamp === timestamp);
+    if (!run) return;
+    setLogs(run.logs);
+    setManifest(run.manifest);
+    setSelectedRunKey(id + timestamp);
+  }, [recentRuns, isExecuting]);
+
   const handleDeploy = useCallback(() => {
     if (nodes.length === 0) {
       alert('Please add nodes to the workflow before deploying');
@@ -726,17 +741,19 @@ function Dashboard() {
     const compiled = compileManifest(nodes, edges, address || '0x0', chainId);
     setManifest(compiled);
     setIsModalOpen(true);
-
-    // Register workflow on-chain if contract is deployed on this network
-    if (getNetwork(chainId).registryAddress) {
-      registerWorkflow(chainId, compiled.workflow_id, JSON.stringify(compiled), compiled.workflow_id)
-        .catch(() => {/* non-blocking — deploy continues even if registry call fails */});
-    }
-  }, [nodes, edges, address]);
+  }, [nodes, edges, address, chainId]);
 
   const handleExecuteManifest = useCallback(async (manifestToExecute: Manifest) => {
     setIsExecuting(true);
+    setSelectedRunKey(null);
     setLogs([]);
+    let runLogs: ExecutionLog[] = [];
+    let runSuccess = false;
+
+    const appendLogs = (newLogs: ExecutionLog[]) => {
+      runLogs = [...runLogs, ...newLogs];
+      setLogs(prev => [...prev, ...newLogs]);
+    };
 
     try {
       const response = await fetch('/api/execute', {
@@ -750,20 +767,14 @@ function Dashboard() {
       }
 
       const result = await response.json();
-      setLogs(result.logs || []);
+      runLogs = result.logs || [];
+      setLogs(runLogs);
+      runSuccess = !!result.success;
 
-      const newRun: RecentRun = {
-        id: manifestToExecute.workflow_id,
-        timestamp: new Date().toISOString(),
-        workflowName,
-        success: !!result.success,
-        logCount: (result.logs || []).length,
-      };
-      setRecentRuns(prev => {
-        const next = [newRun, ...prev].slice(0, 5);
-        localStorage.setItem(RUNS_KEY, JSON.stringify(next));
-        return next;
-      });
+      if (getNetwork(chainId).registryAddress) {
+        registerWorkflow(chainId, manifestToExecute.workflow_id, JSON.stringify(manifestToExecute), manifestToExecute.workflow_id)
+          .catch(() => {});
+      }
 
       if (!result.success) {
         alert(`Workflow failed: ${result.error}`);
@@ -776,33 +787,26 @@ function Dashboard() {
           throw new Error('Wallet not connected — cannot sign storage uploads');
         }
 
-        setLogs((prev) => [
-          ...prev,
-          {
-            id: `log_storage_start_${Date.now()}`,
-            timestamp: new Date().toISOString(),
-            level: 'info' as const,
-            message: `Signing ${pendingAnchors.length} storage upload(s) with your wallet…`,
-          },
-        ]);
+        appendLogs([{
+          id: `log_storage_start_${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          level: 'info' as const,
+          message: `Signing ${pendingAnchors.length} storage upload(s) with your wallet…`,
+        }]);
 
         const anchorResults = await uploadPendingAnchors(pendingAnchors, walletClient, chainId);
 
-        setLogs((prev) => [
-          ...prev,
-          ...anchorResults.map((r) => ({
-            id: `log_anchor_${r.nodeId}_${Date.now()}`,
-            timestamp: r.timestamp,
-            level: 'success' as const,
-            nodeId: r.nodeId,
-            nodeType: 'storage_anchor',
-            message: `Anchored to 0G Storage — ${r.explorer}`,
-            transactionHash: r.transactionHash,
-            data: { rootHash: r.rootHash, key: r.key },
-          })),
-        ]);
+        appendLogs(anchorResults.map((r) => ({
+          id: `log_anchor_${r.nodeId}_${Date.now()}`,
+          timestamp: r.timestamp,
+          level: 'success' as const,
+          nodeId: r.nodeId,
+          nodeType: 'storage_anchor',
+          message: `Anchored to 0G Storage — ${r.explorer}`,
+          transactionHash: r.transactionHash,
+          data: { rootHash: r.rootHash, key: r.key },
+        })));
 
-        // Record execution on-chain for each anchor result
         if (getNetwork(chainId).registryAddress && manifestToExecute) {
           for (const r of anchorResults) {
             recordExecution(chainId, manifestToExecute.workflow_id, r.transactionHash || '', r.key || '')
@@ -821,24 +825,35 @@ function Dashboard() {
         }
       }
     } catch (error: any) {
-      setLogs((prevLogs) => [
-        ...prevLogs,
-        {
-          id: `log_error_${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          level: 'error' as const,
-          message: `Execution error: ${error.message}`,
-        },
-      ]);
+      appendLogs([{
+        id: `log_error_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        level: 'error' as const,
+        message: `Execution error: ${error.message}`,
+      }]);
       alert(`Error executing workflow: ${error.message}`);
     } finally {
       setIsExecuting(false);
+      const newRun: RecentRun = {
+        id: manifestToExecute.workflow_id,
+        timestamp: new Date().toISOString(),
+        workflowName,
+        success: runSuccess,
+        logCount: runLogs.length,
+        logs: runLogs,
+        manifest: manifestToExecute,
+      };
+      setRecentRuns(prev => {
+        const next = [newRun, ...prev].slice(0, 5);
+        localStorage.setItem(RUNS_KEY, JSON.stringify(next));
+        return next;
+      });
     }
-  }, [walletClient]);
+  }, [walletClient, workflowName, chainId]);
 
   return (
     <div className="flex h-screen w-screen bg-bg-0">
-      <Sidebar nodeCount={nodes.length} edgeCount={edges.length} recentRuns={recentRuns} />
+      <Sidebar nodeCount={nodes.length} edgeCount={edges.length} recentRuns={recentRuns} onSelectRun={onSelectRun} selectedRunKey={selectedRunKey} />
       <div className="flex-1 flex flex-col">
         <header style={{ height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 0 20px', background: 'var(--bg-1)', borderBottom: '1px solid var(--line-2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, minWidth: 0 }}>
@@ -880,7 +895,7 @@ function Dashboard() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <Canvas onNodesChange={setNodes} onEdgesChange={setEdges} isRunning={isExecuting} externalNodes={templateNodes} externalEdges={templateEdges} />
 
-          <Drawer logs={logs} manifest={manifest} isRunning={isExecuting} nodeCount={nodes.length} edgeCount={edges.length} />
+          <Drawer logs={logs} manifest={manifest} isRunning={isExecuting} />
         </div>
 
         <ManifestModal
