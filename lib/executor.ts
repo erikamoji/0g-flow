@@ -89,7 +89,7 @@ class ManifestExecutor {
 
     try {
       const { resolved: resolvedParams } = resolveParametersObject(node.params, this.context);
-      const { model, instruction, data_source } = resolvedParams;
+      const { model, instruction, data_source, sealed } = resolvedParams;
       const resolvedInput = typeof data_source === 'string' ? JSON.parse(data_source) : data_source;
 
       const providerUrl = process.env.OG_PROVIDER_URL;
@@ -99,7 +99,7 @@ class ManifestExecutor {
         : `${getNetwork(this.manifest.chain_id).routerApi}/chat/completions`;
       const apiKey = (providerUrl && instrKey) ? instrKey : process.env.OG_ROUTER_API_KEY;
 
-      this.logger.log('debug', `Calling 0G Compute with model: ${model}`, { input: resolvedInput });
+      this.logger.log('debug', `Calling 0G Compute: ${model}${sealed ? ' · verify_tee: true' : ''}`, { input: resolvedInput });
 
       const response = await axios.post(
         endpoint,
@@ -111,6 +111,7 @@ class ManifestExecutor {
           ],
           temperature: 0.7,
           max_tokens: 1024,
+          ...(sealed ? { verify_tee: true } : {}),
         },
         {
           timeout: 30000,
@@ -122,12 +123,31 @@ class ManifestExecutor {
       );
 
       const output = response.data.choices?.[0]?.message?.content || '';
+      const trace = response.data.x_0g_trace || {};
+      const teeVerified = trace.tee_verified ?? null;
+      const chatId = (response.headers as any)['zg-res-key'] ?? response.data.id ?? null;
+
+      if (sealed) {
+        const teeMsg =
+          teeVerified === true  ? `TEE verified ✓ — provider ${(trace.provider || '').slice(0, 10)}…` :
+          teeVerified === false ? `TEE signature FAILED — treat response as untrusted` :
+                                  `verify_tee requested — no tee_verified in trace (provider may not support TEE on this network)`;
+        this.logger.log(
+          teeVerified === false ? 'warn' : 'info',
+          teeMsg,
+          { tee_verified: teeVerified, provider: trace.provider, request_id: trace.request_id }
+        );
+      }
 
       const result = {
-        model: model,
-        output: output,
+        model,
+        output,
         input: resolvedInput,
         timestamp: new Date().toISOString(),
+        tee_verified: teeVerified,
+        og_request_id: trace.request_id ?? null,
+        og_provider: trace.provider ?? null,
+        og_chat_id: chatId,
       };
 
       this.logger.nodeSuccess(nodeId, node.type, result);
