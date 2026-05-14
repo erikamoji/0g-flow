@@ -723,7 +723,7 @@ function Dashboard() {
       return;
     }
 
-    const compiled = compileManifest(nodes, edges, address || '0x0');
+    const compiled = compileManifest(nodes, edges, address || '0x0', chainId);
     setManifest(compiled);
     setIsModalOpen(true);
 

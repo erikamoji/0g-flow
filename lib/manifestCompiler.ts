@@ -14,6 +14,7 @@ export interface ManifestEdge {
 export interface Manifest {
   workflow_id: string;
   owner: string;
+  chain_id: number;
   nodes: ManifestNode[];
   edges: ManifestEdge[];
 }
@@ -21,7 +22,8 @@ export interface Manifest {
 export function compileManifest(
   nodes: Node[],
   edges: Edge[],
-  owner: string = '0x0'
+  owner: string = '0x0',
+  chainId: number = 16602
 ): Manifest {
   const manifestNodes: ManifestNode[] = nodes.map((node) => {
     const baseParams: Record<string, any> = {};
@@ -76,6 +78,7 @@ export function compileManifest(
   return {
     workflow_id: `agnostic_workflow_${Date.now()}`,
     owner: owner,
+    chain_id: chainId,
     nodes: manifestNodes,
     edges: manifestEdges,
   };

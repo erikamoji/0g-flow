@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Manifest } from './manifestCompiler';
 import { ExecutionLogger } from './executionLogger';
 import { resolveParametersObject } from './variableResolver';
+import { getNetwork } from './networks';
 
 export interface ExecutionContext {
   [nodeId: string]: any;
@@ -15,7 +16,6 @@ export interface ExecutionResult {
   logs: any[];
 }
 
-const OG_ROUTER_API = 'https://router-api.0g.ai/v1';
 const OG_STORAGE_INDEXER = process.env.OG_STORAGE_INDEXER || 'https://indexer-storage-testnet-turbo.0g.ai';
 
 class ManifestExecutor {
@@ -92,10 +92,17 @@ class ManifestExecutor {
       const { model, instruction, data_source } = resolvedParams;
       const resolvedInput = typeof data_source === 'string' ? JSON.parse(data_source) : data_source;
 
+      const providerUrl = process.env.OG_PROVIDER_URL;
+      const instrKey = process.env.INSTRUCT_KEY;
+      const endpoint = (providerUrl && instrKey)
+        ? `${providerUrl}/v1/proxy/chat/completions`
+        : `${getNetwork(this.manifest.chain_id).routerApi}/chat/completions`;
+      const apiKey = (providerUrl && instrKey) ? instrKey : process.env.OG_ROUTER_API_KEY;
+
       this.logger.log('debug', `Calling 0G Compute with model: ${model}`, { input: resolvedInput });
 
       const response = await axios.post(
-        `${OG_ROUTER_API}/chat/completions`,
+        endpoint,
         {
           model: model,
           messages: [
@@ -109,7 +116,7 @@ class ManifestExecutor {
           timeout: 30000,
           headers: {
             'Content-Type': 'application/json',
-            ...(process.env.OG_ROUTER_API_KEY ? { 'Authorization': `Bearer ${process.env.OG_ROUTER_API_KEY}` } : {}),
+            ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}),
           },
         }
       );
@@ -127,9 +134,11 @@ class ManifestExecutor {
       this.successCount++;
       return result;
     } catch (error: any) {
-      this.logger.nodeError(nodeId, node.type, error.message);
+      const detail = error.response?.data ? JSON.stringify(error.response.data) : '';
+      const msg = detail ? `${error.message} — ${detail}` : error.message;
+      this.logger.nodeError(nodeId, node.type, msg);
       this.failureCount++;
-      throw error;
+      throw new Error(msg);
     }
   }
 
