@@ -195,21 +195,38 @@ function LandingPage() {
         main.lp-main { padding-top: 64px; }
         .lp-section { padding: 120px 32px; max-width: 1200px; margin: 0 auto; position: relative; }
         .lp-eyebrow { font-family: var(--font-jetbrains-mono, monospace); font-size: 10.5px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-3); }
-        .lp-h1 { font-size: clamp(44px, 6.5vw, 88px); font-weight: 600; line-height: 1.02; letter-spacing: -0.025em; margin: 0; font-family: var(--font-inter-tight, sans-serif); }
-        .lp-h2 { font-size: clamp(30px, 3.8vw, 52px); font-weight: 600; line-height: 1.05; letter-spacing: -0.02em; margin: 0; font-family: var(--font-inter-tight, sans-serif); }
+        .lp-h1 { font-size: clamp(40px, 4.5vw, 64px); font-weight: 500; line-height: 1.02; letter-spacing: -0.025em; margin: 0; font-family: var(--font-display, 'Fraunces', serif); }
+        .lp-h2 { font-size: clamp(28px, 3vw, 40px); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; margin: 0; font-family: var(--font-display, 'Fraunces', serif); }
         .lp-lede { font-size: clamp(15px, 1.3vw, 17px); line-height: 1.6; color: var(--fg-2); max-width: 520px; margin: 0; }
         .lp-grad { background: var(--brand-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
         /* TYPEWRITER */
         .lp-typewriter { display: inline-block; overflow: hidden; white-space: nowrap; max-width: 0; border-right: 2px solid var(--anchor-300); vertical-align: bottom; animation: lp-type 1.1s steps(22, end) 0.5s forwards, lp-cursor 0.7s step-end 0.5s 4; }
         @keyframes lp-type { to { max-width: 680px; } }
         @keyframes lp-cursor { 0%, 100% { border-color: transparent; } 50% { border-color: var(--anchor-300); } }
-        /* HERO */
-        .lp-hero { min-height: calc(100vh - 64px); display: grid; place-items: center; padding: 40px 32px 80px; position: relative; overflow: hidden; }
-        .lp-hero-grid { position: absolute; inset: 0; background-color: var(--bg-0); background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0); background-size: 24px 24px; mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 80%); }
-        .lp-hero-glow { position: absolute; inset: 0; pointer-events: none; }
-        .lp-hero-glow::before { content: ""; position: absolute; width: 600px; height: 600px; border-radius: 50%; filter: blur(100px); opacity: 0.30; background: radial-gradient(circle, var(--input-glow), var(--logic-glow)); left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        /* HERO — editorial 2-column */
+        .lp-hero { min-height: calc(100vh - 64px); display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 72px; padding: 80px 64px 72px; position: relative; overflow: hidden; max-width: 1280px; margin: 0 auto; }
+        @media (max-width: 900px) { .lp-hero { grid-template-columns: 1fr; gap: 48px; padding: 60px 28px 60px; } }
+        .lp-hero-l { display: flex; flex-direction: column; gap: 24px; position: relative; z-index: 1; }
+        .lp-hero-r { position: relative; z-index: 1; }
+        .lp-hero-grid { position: absolute; inset: 0; background-color: var(--bg-0); background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0); background-size: 22px 22px; mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 80%); pointer-events: none; }
+        .lp-hero-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 80% at 100% 50%, rgba(232,74,152,0.08) 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 0% 50%, rgba(240,193,58,0.06) 0%, transparent 50%); }
         .lp-hero-inner { text-align: center; max-width: 860px; position: relative; display: flex; flex-direction: column; align-items: center; gap: 0; }
-        .lp-hero-sub { color: var(--fg-3); margin: 24px auto 0; max-width: 520px; font-size: 16px; line-height: 1.65; }
+        .lp-hero-sub { color: var(--fg-3); margin: 24px auto 0; max-width: 480px; font-size: 17px; line-height: 1.6; }
+        /* Hero verb strip */
+        .lp-verbs { display: flex; align-items: center; gap: 10px; font-family: var(--font-jetbrains-mono, monospace); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; }
+        .lp-verb-sep { color: var(--fg-4); }
+        .lp-verb--in  { color: var(--input-300); }
+        .lp-verb--lo  { color: var(--logic-300); }
+        .lp-verb--an  { color: var(--anchor-300); }
+        /* Hero CTA */
+        .lp-hero-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+        .lp-btn--lg { height: 40px; padding: 0 20px; font-size: 12px; border-radius: 8px; }
+        .lp-btn--primary { background: var(--input-500); color: #fff; font-family: var(--font-jetbrains-mono, monospace); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; height: 36px; padding: 0 18px; border-radius: 7px; border: 0; cursor: pointer; transition: filter 120ms; }
+        .lp-btn--primary:hover { filter: brightness(1.1); }
+        .lp-btn--ghost { background: var(--bg-2); color: var(--fg-2); font-family: var(--font-jetbrains-mono, monospace); font-size: 11px; font-weight: 500; letter-spacing: 0.04em; height: 36px; padding: 0 16px; border-radius: 7px; border: 1px solid var(--line-2); cursor: pointer; transition: background 120ms, color 120ms; }
+        .lp-btn--ghost:hover { background: var(--bg-3); color: var(--fg-1); }
+        /* Hero meta */
+        .lp-hero-meta { display: flex; align-items: center; gap: 8px; font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; color: var(--fg-4); letter-spacing: 0.08em; }
         /* HERO TERMINAL */
         .lp-hero-terminal { margin-top: 40px; width: 100%; max-width: 560px; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; box-shadow: 0 24px 60px -12px rgba(0,0,0,0.5), 0 0 40px -16px rgba(42,123,255,0.15); text-align: left; }
         .lp-ht-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line-2); background: var(--bg-2); }
@@ -406,28 +423,65 @@ function LandingPage() {
 
       <main className="lp-main">
 
-        {/* HERO */}
+        {/* HERO — editorial 2-col */}
         <section className="lp-hero">
           <div className="lp-hero-grid" />
           <div className="lp-hero-glow" />
-          <div className="lp-hero-inner lp-reveal">
-            <h1 className="lp-h1">Build AI that runs on-chain —<br /><span className="lp-grad lp-typewriter" style={{ fontStyle: 'italic' }}>and leaves proof.</span></h1>
-            <p className="lp-hero-sub">0G Flow compiles your workflow into a verifiable manifest. Every inference runs on decentralized compute. Every result is anchored on-chain — permanent, signed, yours.</p>
-            <div className="lp-hero-terminal">
-              <div className="lp-ht-bar"><span className="lp-ht-dot" style={{background:'#FF5F57'}} /><span className="lp-ht-dot" style={{background:'#FFBD2E'}} /><span className="lp-ht-dot" style={{background:'#28C840'}} /><span className="lp-ht-label">execution log</span></div>
-              <div className="lp-ht-body" key={replayKey}>
-                <div className="lp-ht-line lp-ht-l1"><span className="lp-ht-ts">00:00.000</span><span className="lp-ht-info">▶</span><span>workflow started · run-7k2m</span></div>
-                <div className="lp-ht-line lp-ht-l2"><span className="lp-ht-ts">00:00.041</span><span className="lp-ht-info">◆</span><span>data_input resolved · <span className="lp-ht-ok">✓</span></span></div>
-                <div className="lp-ht-line lp-ht-l3"><span className="lp-ht-ts">00:00.120</span><span className="lp-ht-info">◆</span><span>0G Compute · qwen2.5-7b-instruct</span></div>
-                <div className="lp-ht-line lp-ht-l4"><span className="lp-ht-ts">00:01.847</span><span className="lp-ht-info">◆</span><span>inference complete · <span className="lp-ht-ok">✓</span></span></div>
-                <div className="lp-ht-line lp-ht-l5"><span className="lp-ht-ts">00:01.902</span><span className="lp-ht-info">◆</span><span>signing storage upload…</span></div>
-                <div className="lp-ht-line lp-ht-l6"><span className="lp-ht-ts">00:02.391</span><span className="lp-ht-info">◆</span><span>anchored · tx <span className="lp-ht-tx" onClick={() => copyTx('hero')}>0x4f3a…b27c</span> <span className="lp-ht-ok">✓</span></span></div>
-                <div className="lp-ht-line lp-ht-l7"><span className="lp-ht-ts">00:02.401</span><span className="lp-ht-success">■</span><span><span className="lp-ht-ok">workflow complete</span> · 2 nodes · 2.40s</span></div>
+
+          {/* Left: text */}
+          <div className="lp-hero-l lp-reveal">
+            <span className="lp-eyebrow">01 · A visual IDE for verifiable AI</span>
+            <h1 className="lp-h1">Compose AI pipelines<br />you can <span className="lp-grad">prove ran</span>.</h1>
+            <p className="lp-lede">Drag four primitives onto a canvas. Every workflow compiles to a portable manifest, executes through 0G Compute with TEE attestation, settles to 0G Storage, and anchors provenance on 0G Chain.</p>
+            <div className="lp-verbs">
+              <span className="lp-verb--in">Compose</span>
+              <span className="lp-verb-sep">·</span>
+              <span className="lp-verb--lo">Execute</span>
+              <span className="lp-verb-sep">·</span>
+              <span className="lp-verb--an">Verify</span>
+            </div>
+            <div className="lp-hero-cta">
+              <ConnectButton.Custom>
+                {({ account, openConnectModal, openAccountModal, mounted }) => {
+                  if (!mounted) return null;
+                  if (!account) return (
+                    <button className="lp-btn--primary lp-btn--lg" onClick={openConnectModal}>launch canvas →</button>
+                  );
+                  return (
+                    <button className="lp-btn--primary lp-btn--lg" onClick={openAccountModal}>{account.displayName}</button>
+                  );
+                }}
+              </ConnectButton.Custom>
+              <a href="#lp-compose" className="lp-btn--ghost lp-btn--lg" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>read the manifest spec</a>
+            </div>
+            <div className="lp-hero-meta">
+              <span>4 primitives</span><span>·</span>
+              <span>0G mainnet · 16661</span><span>·</span>
+              <span>3 templates ready</span>
+            </div>
+          </div>
+
+          {/* Right: terminal */}
+          <div className="lp-hero-r lp-reveal">
+            <div className="lp-hero-terminal" key={replayKey}>
+              <div className="lp-ht-bar">
+                <span className="lp-ht-dot" style={{background:'#FF5F57'}} />
+                <span className="lp-ht-dot" style={{background:'#FFBD2E'}} />
+                <span className="lp-ht-dot" style={{background:'#28C840'}} />
+                <span className="lp-ht-label">$ 0g flow execute defi-signal-analyzer</span>
+                <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 9, color: 'var(--ok-500)', letterSpacing: '0.08em' }}>live · galileo</span>
+              </div>
+              <div className="lp-ht-body">
+                <div className="lp-ht-line lp-ht-l1"><span className="lp-ht-ts">00:00.000</span><span className="lp-ht-info">◦</span><span>manifest compiled · workflow_id=wf-7k2m-9xab</span></div>
+                <div className="lp-ht-line lp-ht-l2"><span className="lp-ht-ts">00:00.041</span><span className="lp-ht-info">◦</span><span>registerWorkflow → 0G Chain · 0x4f3a…b27c ↗</span></div>
+                <div className="lp-ht-line lp-ht-l3"><span className="lp-ht-info" style={{ color: 'var(--input-300)' }}>◆</span><span style={{ color: 'var(--input-300)', marginLeft: 10 }}>data_input · ETH/USDC market feed</span></div>
+                <div className="lp-ht-line lp-ht-l4"><span className="lp-ht-info" style={{ color: 'var(--logic-300)' }}>◆</span><span style={{ color: 'var(--logic-300)', marginLeft: 10 }}>ai_compute · router-api.0g.ai · sealed=true</span></div>
+                <div className="lp-ht-line lp-ht-l5"><span className="lp-ht-info" style={{ color: 'var(--logic-300)' }}>◆</span><span style={{ marginLeft: 10 }}>inference complete · 142 tok</span></div>
+                <div className="lp-ht-line lp-ht-l6"><span className="lp-ht-success">✓</span><span style={{ color: 'var(--ok-500)', marginLeft: 10 }}>TEE ✓ · tee_verified · provider 0x4f3a…</span></div>
+                <div className="lp-ht-line lp-ht-l7"><span className="lp-ht-info" style={{ color: 'var(--anchor-300)' }}>◆</span><span style={{ color: 'var(--anchor-300)', marginLeft: 10 }}>storage_anchor · 0G Storage · 0x8fa2…e31d</span></div>
+                <div className="lp-ht-line" style={{ animation: 'lp-ht-fade 0.3s ease forwards 2.4s', opacity: 0 }}><span className="lp-ht-success">✓</span><span style={{ color: 'var(--ok-500)', marginLeft: 10 }}>recordExecution · permanently verifiable</span></div>
               </div>
             </div>
-            <button className="lp-scroll-arrow" onClick={() => document.getElementById('lp-compose')?.scrollIntoView({ behavior: 'smooth' })} aria-label="Scroll down">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
-            </button>
           </div>
         </section>
 
@@ -435,8 +489,8 @@ function LandingPage() {
         <section id="lp-compose" className="lp-section">
           <div className="lp-sect-head lp-reveal">
             <span className="lp-eyebrow">01 · Build</span>
-            <h2 className="lp-h2">Three primitives. <span className="lp-grad">Infinite workflows.</span></h2>
-            <p className="lp-lede">Every workflow is the same story: data comes in, AI thinks, proof goes on-chain. Three node types. That's it.</p>
+            <h2 className="lp-h2">Four primitives. <span className="lp-grad">Infinite workflows.</span></h2>
+            <p className="lp-lede">Every workflow is the same story: data comes in, AI thinks, result goes to memory, proof goes on-chain. Four node types. That's it.</p>
           </div>
           <div className="lp-nodes-grid lp-reveal-stagger">
             <div className="lp-archetype lp-input">
@@ -459,12 +513,21 @@ function LandingPage() {
             </div>
             <div className="lp-archetype lp-anchor">
               <div className="lp-a-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v16" /><circle cx="12" cy="6" r="2" /><path d="M5 13c0 4 3 7 7 7s7-3 7-7" /></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21M5 14c0 4 3 7 7 7s7-3 7-7M3 14h4M17 14h4"/></svg>
               </div>
-              <div className="lp-a-eyebrow">Storage</div>
+              <div className="lp-a-eyebrow">Storage Anchor</div>
               <h3>Stored. Permanent. Yours.</h3>
               <p>Your wallet signs the upload. The result lives on 0G Storage forever — a tx hash anyone can verify on the explorer, any time.</p>
               <div className="lp-a-meta"><span className="lp-tag">KECCAK256</span><span className="lp-tag">3 / 3 REPLICAS</span></div>
+            </div>
+            <div className="lp-archetype lp-memory">
+              <div className="lp-a-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="8" ry="2.5"/><path d="M20 12c0 1.4-3.6 2.5-8 2.5S4 13.4 4 12"/><path d="M4 5v14c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V5"/></svg>
+              </div>
+              <div className="lp-a-eyebrow">Memory Store</div>
+              <h3>Context that persists across runs.</h3>
+              <p>Seal agent memory to 0G Storage between sessions. Retrieve it with cryptographic proof that it hasn't changed.</p>
+              <div className="lp-a-meta"><span className="lp-tag">SEALED</span><span className="lp-tag">RETRIEVAL</span><span className="lp-tag">VERIFIABLE</span></div>
             </div>
           </div>
         </section>
@@ -678,6 +741,7 @@ function Dashboard() {
   const [templateNodes, setTemplateNodes] = useState<Node[] | null>(null);
   const [templateEdges, setTemplateEdges] = useState<Edge[] | null>(null);
   const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
 
   useEffect(() => {
     try {
@@ -780,6 +844,7 @@ function Dashboard() {
         alert(`Workflow failed: ${result.error}`);
         return;
       }
+      setShowReceipt(true);
 
       const pendingAnchors: PendingAnchor[] = result.pendingAnchors || [];
       if (pendingAnchors.length > 0) {
@@ -855,7 +920,7 @@ function Dashboard() {
     <div className="flex h-screen w-screen bg-bg-0">
       <Sidebar nodeCount={nodes.length} edgeCount={edges.length} recentRuns={recentRuns} onSelectRun={onSelectRun} selectedRunKey={selectedRunKey} />
       <div className="flex-1 flex flex-col">
-        <header style={{ height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 0 20px', background: 'var(--bg-1)', borderBottom: '1px solid var(--line-2)' }}>
+        <header style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 0 20px', background: 'var(--bg-1)', borderBottom: '1px solid var(--line-2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-3)' }}>
               <span>WORKFLOWS</span>
@@ -881,6 +946,14 @@ function Dashboard() {
             >
               Templates
             </button>
+            {logs.length > 0 && (
+              <button
+                onClick={() => setShowReceipt(true)}
+                style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-3)', padding: '6px 12px', borderRadius: 6, cursor: 'pointer' }}
+              >
+                receipt
+              </button>
+            )}
             <button
               onClick={handleDeploy}
               disabled={isExecuting}
@@ -904,6 +977,10 @@ function Dashboard() {
           onClose={() => setIsModalOpen(false)}
           onExecute={handleExecuteManifest}
         />
+
+        {showReceipt && (
+          <ReceiptModal manifest={manifest} logs={logs} onClose={() => setShowReceipt(false)} />
+        )}
 
         {isTemplatePickerOpen && (
           <div
@@ -952,6 +1029,75 @@ function Dashboard() {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ReceiptModal({ manifest, logs, onClose }: { manifest: Manifest | null; logs: ExecutionLog[]; onClose: () => void }) {
+  const successCount = logs.filter(l => l.level === 'success').length;
+  const errorCount = logs.filter(l => l.level === 'error').length;
+  const anchors = logs.filter(l => l.transactionHash);
+  const ts = new Date().toLocaleString('en-US', { hour12: false });
+
+  const handlePrint = () => window.print();
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <style>{`
+        @media print {
+          body > *:not(.receipt-print-root) { display: none !important; }
+          .receipt-print-root { position: fixed !important; inset: 0 !important; background: white !important; color: black !important; padding: 32px !important; font-family: monospace !important; }
+          .receipt-no-print { display: none !important; }
+        }
+      `}</style>
+      <div className="receipt-print-root" style={{ background: 'var(--bg-1)', border: '1px solid var(--line-2)', borderRadius: 12, width: '100%', maxWidth: 520, boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', borderBottom: '1px solid var(--line-1)', background: 'var(--bg-2)', borderRadius: '12px 12px 0 0' }}>
+          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF5F57' }} />
+          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#FFBD2E' }} />
+          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#28C840' }} />
+          <span style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.10em', marginLeft: 6 }}>execution receipt · {manifest?.workflow_id || 'unknown'}</span>
+          <button className="receipt-no-print" onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--fg-4)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}>×</button>
+        </div>
+        <div style={{ padding: '20px 20px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, padding: '10px 14px', background: errorCount > 0 ? 'rgba(244,113,116,0.08)' : 'rgba(52,211,153,0.08)', border: `1px solid ${errorCount > 0 ? 'rgba(244,113,116,0.25)' : 'rgba(52,211,153,0.25)'}`, borderRadius: 8 }}>
+            <span style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 18 }}>{errorCount > 0 ? '✗' : '✓'}</span>
+            <div>
+              <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 12, fontWeight: 600, color: errorCount > 0 ? 'var(--err-500)' : 'var(--ok-500)' }}>{errorCount > 0 ? 'EXECUTION FAILED' : 'EXECUTION COMPLETE'}</div>
+              <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-4)', marginTop: 2 }}>{ts}</div>
+            </div>
+          </div>
+          {[
+            { k: 'Workflow ID', v: manifest?.workflow_id || '—' },
+            { k: 'Nodes', v: String(manifest?.nodes.length ?? '—') },
+            { k: 'Edges', v: String(manifest?.edges.length ?? '—') },
+            { k: 'Log events', v: String(logs.length) },
+            { k: 'Successful', v: String(successCount), hi: !errorCount },
+            { k: 'Errors', v: String(errorCount), hi: errorCount > 0 },
+          ].map(row => (
+            <div key={row.k} style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: 8, padding: '5px 0', borderBottom: '1px solid var(--line-1)', fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11 }}>
+              <span style={{ color: 'var(--fg-4)', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', alignSelf: 'center' }}>{row.k}</span>
+              <span style={{ color: (row as any).hi ? 'var(--ok-500)' : 'var(--fg-1)' }}>{row.v}</span>
+            </div>
+          ))}
+          {anchors.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--fg-4)', marginBottom: 6 }}>Anchor Transactions</div>
+              {anchors.map(l => (
+                <div key={l.id} style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--anchor-300)', padding: '2px 0' }}>
+                  ✓ {l.transactionHash?.slice(0, 18)}…
+                  {l.transactionHash && (
+                    <a href={`https://explorer.0g.ai/tx/${l.transactionHash}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--input-300)', marginLeft: 8 }}>↗ explorer</a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="receipt-no-print" style={{ display: 'flex', gap: 8, padding: '12px 20px 16px', borderTop: '1px solid var(--line-1)' }}>
+          <button onClick={handlePrint} style={{ flex: 1, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.06em', height: 32, border: '1px solid var(--line-2)', borderRadius: 6, background: 'var(--bg-2)', color: 'var(--fg-1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>⎙ print / save pdf</button>
+          <button onClick={onClose} style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.06em', height: 32, padding: '0 16px', border: '1px solid var(--line-2)', borderRadius: 6, background: 'transparent', color: 'var(--fg-3)', cursor: 'pointer' }}>close</button>
+        </div>
       </div>
     </div>
   );
