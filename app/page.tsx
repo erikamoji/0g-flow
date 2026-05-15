@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Node, Edge } from 'reactflow';
-import { useAccount, useWalletClient, useChainId, useDisconnect, useSwitchChain } from 'wagmi';
+import { useAccount, useWalletClient, useChainId, useDisconnect } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { uploadPendingAnchors, type PendingAnchor } from '@/lib/storageClient';
 import { Sidebar } from '@/components/Sidebar';
@@ -732,8 +732,21 @@ function Dashboard() {
   const { data: walletClient } = useWalletClient();
   const chainId = useChainId();
   const { disconnect } = useDisconnect();
-  const { switchChain } = useSwitchChain();
   const [chainMenuOpen, setChainMenuOpen] = useState(false);
+
+  const switchChain = useCallback(async (targetId: number) => {
+    const eth = (window as any).ethereum;
+    if (!eth) return;
+    try {
+      await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + targetId.toString(16) }] });
+    } catch (e: any) {
+      if (e.code === 4902) {
+        const chain = OG_CHAINS.find(c => parseInt(c.chainId, 16) === targetId);
+        if (chain) await eth.request({ method: 'wallet_addEthereumChain', params: [chain] });
+      }
+    }
+    setChainMenuOpen(false);
+  }, []);
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -962,7 +975,7 @@ function Dashboard() {
             {chainMenuOpen && (
               <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 50, background: 'var(--bg-1)', border: '1px solid var(--line-2)', borderRadius: 8, overflow: 'hidden', minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
                 {([{ id: 16602, label: '0G GALILEO', sub: 'testnet' }, { id: 16661, label: '0G ARISTOTLE', sub: 'mainnet' }] as const).map(c => (
-                  <button key={c.id} onClick={() => { switchChain({ chainId: c.id }); setChainMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', background: c.id === chainId ? 'var(--bg-3)' : 'none', border: 'none', padding: '9px 14px', cursor: 'pointer', fontFamily: 'var(--font-jetbrains-mono, monospace)', textAlign: 'left' }}>
+                  <button key={c.id} onClick={() => switchChain(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', background: c.id === chainId ? 'var(--bg-3)' : 'none', border: 'none', padding: '9px 14px', cursor: 'pointer', fontFamily: 'var(--font-jetbrains-mono, monospace)', textAlign: 'left' }}>
                     <span style={{ width: 5, height: 5, borderRadius: '50%', background: c.id === chainId ? 'var(--ok-500)' : 'var(--fg-4)', flexShrink: 0 }} />
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: c.id === chainId ? 'var(--fg-1)' : 'var(--fg-3)' }}>{c.label}</div>
