@@ -101,6 +101,7 @@ export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: on
         onDrop={onDrop}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        deleteKeyCode={['Delete', 'Backspace']}
         fitView
       >
         <Background gap={24} size={1} color="rgba(255,255,255,0.045)" />
