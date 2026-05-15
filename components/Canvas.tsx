@@ -171,7 +171,7 @@ export function Canvas({ onNodesChange: onNodesChangeCallback, onEdgesChange: on
       >
         <Background gap={24} size={1} color="rgba(255,255,255,0.045)" />
         <Controls style={{ backgroundColor: '#131922', border: '1px solid #232C3C', borderRadius: 8 }} />
-        <MiniMap maskColor="rgba(7,9,12,0.6)" nodeColor="#2A7BFF" style={{ backgroundColor: '#0C1117', border: '1px solid #232C3C' }} />
+        <MiniMap maskColor="rgba(7,9,12,0.6)" nodeColor="#F08A3A" style={{ backgroundColor: '#0C1117', border: '1px solid #232C3C' }} />
       </ReactFlow>
     </div>
   );

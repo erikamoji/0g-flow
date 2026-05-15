@@ -543,10 +543,10 @@ function LandingPage() {
             <svg className="lp-demo-edges">
               <defs>
                 <linearGradient id="lp-e1" x1="0" x2="1" y1="0" y2="0">
-                  <stop offset="0" stopColor="#6FB1FF" /><stop offset="1" stopColor="#B49AFF" />
+                  <stop offset="0" stopColor="#FFB36F" /><stop offset="1" stopColor="#FF95C8" />
                 </linearGradient>
                 <linearGradient id="lp-e2" x1="0" x2="1" y1="0" y2="0">
-                  <stop offset="0" stopColor="#B49AFF" /><stop offset="1" stopColor="#5DE3A5" />
+                  <stop offset="0" stopColor="#FF95C8" /><stop offset="1" stopColor="#FFE066" />
                 </linearGradient>
                 <filter id="lp-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
                   <feGaussianBlur stdDeviation="2" result="blur" />
@@ -556,31 +556,31 @@ function LandingPage() {
               <path id="lp-path-e1" className="lp-demo-edge lp-flow" pathLength={100} ref={edge1Ref} stroke="url(#lp-e1)" />
               <path id="lp-path-e2" className="lp-demo-edge lp-flow" pathLength={100} ref={edge2Ref} stroke="url(#lp-e2)" />
               {/* Particles on edge 1 */}
-              <circle ref={p1aRef} r={3} fill="#6FB1FF" className="lp-particle">
+              <circle ref={p1aRef} r={3} fill="#FFB36F" className="lp-particle">
                 <animateMotion dur="1.8s" repeatCount="indefinite" begin="1.3s">
                   <mpath href="#lp-path-e1" />
                 </animateMotion>
               </circle>
-              <circle ref={p1bRef} r={3} fill="#B49AFF" className="lp-particle">
+              <circle ref={p1bRef} r={3} fill="#FF95C8" className="lp-particle">
                 <animateMotion dur="1.8s" repeatCount="indefinite" begin="2.2s">
                   <mpath href="#lp-path-e1" />
                 </animateMotion>
               </circle>
               {/* Particles on edge 2 */}
-              <circle ref={p2aRef} r={3} fill="#B49AFF" className="lp-particle">
+              <circle ref={p2aRef} r={3} fill="#FF95C8" className="lp-particle">
                 <animateMotion dur="1.8s" repeatCount="indefinite" begin="1.7s">
                   <mpath href="#lp-path-e2" />
                 </animateMotion>
               </circle>
-              <circle ref={p2bRef} r={3} fill="#5DE3A5" className="lp-particle">
+              <circle ref={p2bRef} r={3} fill="#FFE066" className="lp-particle">
                 <animateMotion dur="1.8s" repeatCount="indefinite" begin="2.5s">
                   <mpath href="#lp-path-e2" />
                 </animateMotion>
               </circle>
-              <g className="lp-demo-handle" ref={hIoutRef}><circle className="lp-ring" r={4.5} stroke="#6FB1FF" strokeWidth={1.5} /><circle r={1.75} fill="#6FB1FF" /></g>
-              <g className="lp-demo-handle" ref={hLinRef}><circle className="lp-ring" r={4.5} stroke="#B49AFF" strokeWidth={1.5} /><circle r={1.75} fill="#B49AFF" /></g>
-              <g className="lp-demo-handle" ref={hLoutRef}><circle className="lp-ring" r={4.5} stroke="#B49AFF" strokeWidth={1.5} /><circle r={1.75} fill="#B49AFF" /></g>
-              <g className="lp-demo-handle" ref={hAinRef}><circle className="lp-ring" r={4.5} stroke="#5DE3A5" strokeWidth={1.5} /><circle r={1.75} fill="#5DE3A5" /></g>
+              <g className="lp-demo-handle" ref={hIoutRef}><circle className="lp-ring" r={4.5} stroke="#FFB36F" strokeWidth={1.5} /><circle r={1.75} fill="#FFB36F" /></g>
+              <g className="lp-demo-handle" ref={hLinRef}><circle className="lp-ring" r={4.5} stroke="#FF95C8" strokeWidth={1.5} /><circle r={1.75} fill="#FF95C8" /></g>
+              <g className="lp-demo-handle" ref={hLoutRef}><circle className="lp-ring" r={4.5} stroke="#FF95C8" strokeWidth={1.5} /><circle r={1.75} fill="#FF95C8" /></g>
+              <g className="lp-demo-handle" ref={hAinRef}><circle className="lp-ring" r={4.5} stroke="#FFE066" strokeWidth={1.5} /><circle r={1.75} fill="#FFE066" /></g>
             </svg>
             <div className="lp-demo-node lp-input" ref={inputNodeRef}>
               <div className="lp-row">

@@ -15,28 +15,47 @@ export function GradientEdge(props: EdgeProps) {
     targetPosition,
   });
 
-  let gradientId = `${id}-grad`;
+  const gradientId = `${id}-grad`;
   let gradientDef: ReactNode;
 
-  if (data?.kind === 'in-lo' || source.startsWith('data_input')) {
+  if (source.startsWith('data_input')) {
+    // orange → pink
     gradientDef = (
       <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#6FB1FF" />
-        <stop offset="100%" stopColor="#B49AFF" />
+        <stop offset="0%" stopColor="#FFB36F" />
+        <stop offset="100%" stopColor="#FF95C8" />
       </linearGradient>
     );
-  } else if (data?.kind === 'lo-an' || source.startsWith('ai_compute')) {
+  } else if (source.startsWith('ai_compute')) {
+    // pink → yellow
     gradientDef = (
       <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#B49AFF" />
-        <stop offset="100%" stopColor="#5DE3A5" />
+        <stop offset="0%" stopColor="#FF95C8" />
+        <stop offset="100%" stopColor="#FFE066" />
+      </linearGradient>
+    );
+  } else if (source.startsWith('memory_store')) {
+    // lime → orange
+    gradientDef = (
+      <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#B6FF8F" />
+        <stop offset="100%" stopColor="#FFB36F" />
+      </linearGradient>
+    );
+  } else if (source.startsWith('storage_anchor')) {
+    // yellow → lime
+    gradientDef = (
+      <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#FFE066" />
+        <stop offset="100%" stopColor="#B6FF8F" />
       </linearGradient>
     );
   } else {
+    // fallback: orange → pink
     gradientDef = (
       <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#6B7585" />
-        <stop offset="100%" stopColor="#6B7585" />
+        <stop offset="0%" stopColor="#FFB36F" />
+        <stop offset="100%" stopColor="#FF95C8" />
       </linearGradient>
     );
   }

@@ -64,7 +64,7 @@ export function MemoryNode({ id, data }: { id: string; data: any }) {
             </svg>
             {mode === 'write' ? 'Write memory' : 'Read memory'}
           </div>
-          <span className={`toggle ${mode === 'write' ? 'on' : ''}`} style={{ '--toggle-on-bg': 'var(--memory-500)', '--toggle-on-bg-alpha': 'rgba(6,182,212,0.20)', '--toggle-on-border': 'rgba(103,232,249,0.35)', '--toggle-on-glow': 'var(--memory-glow)' } as any} />
+          <span className={`toggle ${mode === 'write' ? 'on' : ''}`} style={{ '--toggle-on-bg': 'var(--memory-500)', '--toggle-on-bg-alpha': 'rgba(111,204,58,0.20)', '--toggle-on-border': 'rgba(182,255,143,0.35)', '--toggle-on-glow': 'var(--memory-glow)' } as any} />
         </div>
 
         {mode === 'write' ? (

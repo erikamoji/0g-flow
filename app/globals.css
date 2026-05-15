@@ -54,7 +54,7 @@
   --err-500:   #F47174;
   --err-glow:  rgba(244,113,116,0.45);
 
-  --brand-grad: linear-gradient(135deg, #6FB1FF 0%, #B49AFF 55%, #5DE3A5 100%);
+  --brand-grad: linear-gradient(135deg, #FFB36F 0%, #FF95C8 50%, #FFE066 100%);
 
   --grid-size: 22px;
   --grid-dot:  rgba(255,255,255,0.07);
