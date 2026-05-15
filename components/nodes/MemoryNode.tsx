@@ -5,7 +5,6 @@ import { Handle, Position, useReactFlow } from 'reactflow';
 
 export function MemoryNode({ id, data }: { id: string; data: any }) {
   const { setNodes, setEdges } = useReactFlow();
-  const status = data.status || 'idle';
   const name = data.name || '0G Memory · Store';
   const mode = data.mode || 'write';
   const memKey = data.memKey || 'agent_memory';
@@ -46,7 +45,6 @@ export function MemoryNode({ id, data }: { id: string; data: any }) {
           )}
           <span className="id">{nodeId}</span>
         </div>
-        <span className={`status status-${status}`} />
         <button onClick={e => { e.stopPropagation(); setNodes(nds => nds.filter(n => n.id !== id)); setEdges(eds => eds.filter(e => e.source !== id && e.target !== id)); }} style={{ background: 'none', border: 'none', padding: '0 2px', cursor: 'pointer', color: 'var(--fg-4)', fontSize: 14, lineHeight: 1, flexShrink: 0 }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--err-500)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-4)')} title="Delete node">×</button>
         <Handle type="source" position={Position.Right} id="output" style={{ background: 'var(--bg-3)', border: '2px solid var(--memory-300)', width: 12, height: 12, borderRadius: 9999 }} />
       </div>

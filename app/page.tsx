@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Node, Edge } from 'reactflow';
-import { useAccount, useWalletClient, useChainId, useDisconnect } from 'wagmi';
+import { useAccount, useWalletClient, useChainId, useDisconnect, useSwitchChain } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { uploadPendingAnchors, type PendingAnchor } from '@/lib/storageClient';
 import { Sidebar } from '@/components/Sidebar';
@@ -732,6 +732,8 @@ function Dashboard() {
   const { data: walletClient } = useWalletClient();
   const chainId = useChainId();
   const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
+  const [chainMenuOpen, setChainMenuOpen] = useState(false);
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -948,10 +950,29 @@ function Dashboard() {
               <span style={{ color: 'var(--fg-1)', cursor: 'text', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onClick={() => setIsEditingName(true)}>{workflowName}</span>
             )}
           </div>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-3)', padding: '4px 10px', borderRadius: 20, whiteSpace: 'nowrap' }}>
-            <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--ok-500)', boxShadow: '0 0 6px var(--ok-glow)', flexShrink: 0 }} />
-            {TOPBAR_CHAIN_NAMES[chainId] || `CHAIN ${chainId}`}
-          </span>
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => setChainMenuOpen(o => !o)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-3)', padding: '4px 10px', borderRadius: 20, whiteSpace: 'nowrap', cursor: 'pointer' }}>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--ok-500)', boxShadow: '0 0 6px var(--ok-glow)', flexShrink: 0 }} />
+              {TOPBAR_CHAIN_NAMES[chainId] || `CHAIN ${chainId}`}
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            {chainMenuOpen && (
+              <div onClick={() => setChainMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 49 }} />
+            )}
+            {chainMenuOpen && (
+              <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 50, background: 'var(--bg-1)', border: '1px solid var(--line-2)', borderRadius: 8, overflow: 'hidden', minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
+                {([{ id: 16602, label: '0G GALILEO', sub: 'testnet' }, { id: 16661, label: '0G ARISTOTLE', sub: 'mainnet' }] as const).map(c => (
+                  <button key={c.id} onClick={() => { switchChain({ chainId: c.id }); setChainMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', background: c.id === chainId ? 'var(--bg-3)' : 'none', border: 'none', padding: '9px 14px', cursor: 'pointer', fontFamily: 'var(--font-jetbrains-mono, monospace)', textAlign: 'left' }}>
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: c.id === chainId ? 'var(--ok-500)' : 'var(--fg-4)', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: c.id === chainId ? 'var(--fg-1)' : 'var(--fg-3)' }}>{c.label}</div>
+                      <div style={{ fontSize: 9, letterSpacing: '0.10em', color: 'var(--fg-4)', marginTop: 1 }}>{c.sub}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
             <button
               onClick={handleDeploy}

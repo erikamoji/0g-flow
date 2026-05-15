@@ -8,8 +8,16 @@ interface SidebarProps {
   onLoadTemplate?: (t: WorkflowTemplate) => void;
 }
 
+const ChevronIcon = ({ open }: { open: boolean }) => (
+  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'transform 150ms', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}>
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
 export function Sidebar({ onLoadTemplate }: SidebarProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [paletteOpen, setPaletteOpen] = useState(true);
+  const [templatesOpen, setTemplatesOpen] = useState(true);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: NodeType) => {
     event.dataTransfer.effectAllowed = 'move';
@@ -31,9 +39,12 @@ export function Sidebar({ onLoadTemplate }: SidebarProps) {
         <p className="eyebrow" style={{ marginTop: 8 }}>Visual Agent Builder</p>
       </div>
 
-      <div className="sidebar-section" style={{ flex: 1, overflow: 'auto' }}>
-        <div className="eyebrow" style={{ marginBottom: 8 }}>Node Palette</div>
-        <div className="palette-list">
+      <div className="sidebar-section" style={{ flex: paletteOpen ? 1 : 0, overflow: 'auto', minHeight: 0 }}>
+        <button onClick={() => setPaletteOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', marginBottom: paletteOpen ? 8 : 0 }}>
+          <span className="eyebrow">Node Palette</span>
+          <ChevronIcon open={paletteOpen} />
+        </button>
+        {paletteOpen && <div className="palette-list">
           {(Object.entries(NODE_TYPES) as Array<[NodeType, any]>).map(([key, config]) => {
             const variantClass = { data_input: 'input', ai_compute: 'logic', storage_anchor: 'anchor', memory_store: 'memory' }[key] || 'input';
             const subId = { data_input: 'IN · TRIGGER', ai_compute: 'LX · 0G COMPUTE', storage_anchor: 'AN · 0G STORAGE', memory_store: 'MM · 0G MEMORY' }[key] || '';
@@ -54,12 +65,15 @@ export function Sidebar({ onLoadTemplate }: SidebarProps) {
               </div>
             );
           })}
-        </div>
+        </div>}
       </div>
 
       <div className="sidebar-section" style={{ borderTop: '1px solid var(--line-2)', flexShrink: 0 }}>
-        <div className="eyebrow" style={{ marginBottom: 10 }}>Templates</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <button onClick={() => setTemplatesOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', marginBottom: templatesOpen ? 10 : 0 }}>
+          <span className="eyebrow">Templates</span>
+          <ChevronIcon open={templatesOpen} />
+        </button>
+        {templatesOpen && <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {WORKFLOW_TEMPLATES.map((t) => (
             <div
               key={t.id}
@@ -75,7 +89,7 @@ export function Sidebar({ onLoadTemplate }: SidebarProps) {
               </div>
             </div>
           ))}
-        </div>
+        </div>}
       </div>
     </aside>
   );
