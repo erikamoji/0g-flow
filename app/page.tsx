@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Node, Edge } from 'reactflow';
-import { useAccount, useWalletClient, useChainId } from 'wagmi';
+import { useAccount, useWalletClient, useChainId, useDisconnect } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { uploadPendingAnchors, type PendingAnchor } from '@/lib/storageClient';
 import { Sidebar } from '@/components/Sidebar';
@@ -721,10 +721,17 @@ interface RecentRun {
   manifest: Manifest | null;
 }
 
+const TOPBAR_CHAIN_NAMES: Record<number, string> = {
+  16600: '0G TESTNET',
+  16602: '0G GALILEO',
+  16661: '0G ARISTOTLE',
+};
+
 function Dashboard() {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
   const chainId = useChainId();
+  const { disconnect } = useDisconnect();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -740,8 +747,8 @@ function Dashboard() {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const [templateNodes, setTemplateNodes] = useState<Node[] | null>(null);
   const [templateEdges, setTemplateEdges] = useState<Edge[] | null>(null);
-  const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<'log' | 'manifest' | 'verify' | 'history'>('log');
 
   useEffect(() => {
     try {
@@ -784,7 +791,6 @@ function Dashboard() {
     setTemplateNodes([...t.nodes]);
     setTemplateEdges([...t.edges]);
     setWorkflowName(t.name);
-    setIsTemplatePickerOpen(false);
   }, []);
 
   const onSelectRun = useCallback((id: string, timestamp: string) => {
@@ -794,6 +800,11 @@ function Dashboard() {
     setLogs(run.logs);
     setManifest(run.manifest);
     setSelectedRunKey(id + timestamp);
+    if (run.logs.length > 0 && run.manifest) {
+      setShowReceipt(true);
+    } else {
+      setDrawerTab('log');
+    }
   }, [recentRuns, isExecuting]);
 
   const handleDeploy = useCallback(() => {
@@ -918,42 +929,30 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen w-screen bg-bg-0">
-      <Sidebar nodeCount={nodes.length} edgeCount={edges.length} recentRuns={recentRuns} onSelectRun={onSelectRun} selectedRunKey={selectedRunKey} />
+      <Sidebar onLoadTemplate={loadTemplate} />
       <div className="flex-1 flex flex-col">
-        <header style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 0 20px', background: 'var(--bg-1)', borderBottom: '1px solid var(--line-2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-3)' }}>
-              <span>WORKFLOWS</span>
-              <span style={{ color: 'var(--fg-4)' }}>/</span>
-              {isEditingName ? (
-                <input
-                  ref={nameInputRef}
-                  value={workflowName}
-                  onChange={(e) => setWorkflowName(e.target.value)}
-                  onBlur={commitName}
-                  onKeyDown={(e) => { if (e.key === 'Enter') commitName(); }}
-                  style={{ color: 'var(--fg-1)', background: 'transparent', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit', width: Math.max(60, workflowName.length * 8) }}
-                />
-              ) : (
-                <span style={{ color: 'var(--fg-1)', cursor: 'text' }} onClick={() => setIsEditingName(true)}>{workflowName}</span>
-              )}
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              onClick={() => setIsTemplatePickerOpen(true)}
-              style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-3)', padding: '6px 12px', borderRadius: 6, cursor: 'pointer' }}
-            >
-              Templates
-            </button>
-            {logs.length > 0 && (
-              <button
-                onClick={() => setShowReceipt(true)}
-                style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-3)', padding: '6px 12px', borderRadius: 6, cursor: 'pointer' }}
-              >
-                receipt
-              </button>
+        <header style={{ height: 48, display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', padding: '0 16px 0 20px', background: 'var(--bg-1)', borderBottom: '1px solid var(--line-2)', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fg-3)', minWidth: 0 }}>
+            <span style={{ color: 'var(--fg-2)', fontWeight: 600, flexShrink: 0 }}>0G Flow</span>
+            <span style={{ color: 'var(--fg-4)' }}>/</span>
+            {isEditingName ? (
+              <input
+                ref={nameInputRef}
+                value={workflowName}
+                onChange={(e) => setWorkflowName(e.target.value)}
+                onBlur={commitName}
+                onKeyDown={(e) => { if (e.key === 'Enter') commitName(); }}
+                style={{ color: 'var(--fg-1)', background: 'transparent', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit', width: Math.max(60, workflowName.length * 8) }}
+              />
+            ) : (
+              <span style={{ color: 'var(--fg-1)', cursor: 'text', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onClick={() => setIsEditingName(true)}>{workflowName}</span>
             )}
+          </div>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-3)', padding: '4px 10px', borderRadius: 20, whiteSpace: 'nowrap' }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--ok-500)', boxShadow: '0 0 6px var(--ok-glow)', flexShrink: 0 }} />
+            {TOPBAR_CHAIN_NAMES[chainId] || `CHAIN ${chainId}`}
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
             <button
               onClick={handleDeploy}
               disabled={isExecuting}
@@ -962,13 +961,38 @@ function Dashboard() {
               {isExecuting && <span className="shimmer" />}
               {isExecuting ? 'Running…' : 'Deploy'}
             </button>
+            <ConnectButton.Custom>
+              {({ account, openConnectModal, mounted }) => {
+                if (!mounted) return null;
+                if (!account) return (
+                  <button onClick={openConnectModal} style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', color: 'var(--fg-2)', padding: '5px 10px', borderRadius: 6, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    Connect
+                  </button>
+                );
+                return (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.10em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderLeft: '2px solid var(--ok-500)', color: 'var(--fg-1)', padding: '4px 8px 4px 10px', borderRadius: 6, flexShrink: 0 }}>
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--ok-500)', boxShadow: '0 0 6px var(--ok-glow)', flexShrink: 0 }} />
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 90 }}>{account.displayName}</span>
+                    <button onClick={() => disconnect()} title="Disconnect" style={{ background: 'none', border: 'none', color: 'var(--fg-4)', cursor: 'pointer', padding: 0, lineHeight: 0, borderRadius: 3, flexShrink: 0, marginLeft: 2, transition: 'color 150ms' }}
+                      onMouseEnter={e => (e.currentTarget.style.color = 'var(--err-500)')}
+                      onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-4)')}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                    </button>
+                  </div>
+                );
+              }}
+            </ConnectButton.Custom>
           </div>
         </header>
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <Canvas onNodesChange={setNodes} onEdgesChange={setEdges} isRunning={isExecuting} externalNodes={templateNodes} externalEdges={templateEdges} />
 
-          <Drawer logs={logs} manifest={manifest} isRunning={isExecuting} />
+          <Drawer logs={logs} manifest={manifest} isRunning={isExecuting} recentRuns={recentRuns} onSelectRun={onSelectRun} selectedRunKey={selectedRunKey} activeTab={drawerTab} onTabChange={setDrawerTab} />
         </div>
 
         <ManifestModal
@@ -982,53 +1006,6 @@ function Dashboard() {
           <ReceiptModal manifest={manifest} logs={logs} onClose={() => setShowReceipt(false)} />
         )}
 
-        {isTemplatePickerOpen && (
-          <div
-            onClick={() => setIsTemplatePickerOpen(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}
-            onKeyDown={(e) => { if (e.key === 'Escape') setIsTemplatePickerOpen(false); }}
-          >
-            <div
-              onClick={(e) => e.stopPropagation()}
-              style={{ background: 'var(--bg-1)', border: '1px solid var(--line-2)', borderRadius: 10, padding: 24, width: 520, maxWidth: '90vw', display: 'flex', flexDirection: 'column', gap: 12 }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                <span style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--fg-4)' }}>Workflow Templates</span>
-                <button onClick={() => setIsTemplatePickerOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--fg-4)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 0 }}>×</button>
-              </div>
-              {WORKFLOW_TEMPLATES.map((t) => {
-                const dotColor: Record<string, string> = {
-                  data_input: 'var(--input-400)',
-                  ai_compute: 'var(--logic-400)',
-                  storage_anchor: 'var(--anchor-400)',
-                  memory_store: 'var(--memory-400, #22d3ee)',
-                };
-                return (
-                  <div key={t.id} style={{ background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderRadius: 7, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'var(--fg-1)', marginBottom: 4 }}>{t.name}</div>
-                      <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-4)', letterSpacing: '0.06em', marginBottom: 8 }}>{t.description}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        {t.nodes.map((n, i) => (
-                          <React.Fragment key={n.id}>
-                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor[n.type || ''] || 'var(--fg-4)', display: 'inline-block', flexShrink: 0 }} title={n.type || ''} />
-                            {i < t.nodes.length - 1 && <span style={{ color: 'var(--fg-5, var(--fg-4))', fontSize: 9 }}>→</span>}
-                          </React.Fragment>
-                        ))}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => loadTemplate(t)}
-                      style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--bg-0, var(--bg-1))', border: '1px solid var(--line-2)', color: 'var(--fg-2)', padding: '6px 14px', borderRadius: 5, cursor: 'pointer', flexShrink: 0 }}
-                    >
-                      Load
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
