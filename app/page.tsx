@@ -8,7 +8,7 @@ import { uploadPendingAnchors, type PendingAnchor } from '@/lib/storageClient';
 import { Sidebar } from '@/components/Sidebar';
 import { Canvas } from '@/components/Canvas';
 import { ManifestModal } from '@/components/ManifestModal';
-import { Drawer } from '@/components/Drawer';
+import { Drawer, ExecutionReceipt } from '@/components/Drawer';
 import { WalletButton } from '@/components/WalletButton';
 import { compileManifest, Manifest } from '@/lib/manifestCompiler';
 import { ExecutionLog } from '@/lib/executionLogger';
@@ -1046,69 +1046,23 @@ function Dashboard() {
 }
 
 function ReceiptModal({ manifest, logs, onClose }: { manifest: Manifest | null; logs: ExecutionLog[]; onClose: () => void }) {
-  const successCount = logs.filter(l => l.level === 'success').length;
-  const errorCount = logs.filter(l => l.level === 'error').length;
-  const anchors = logs.filter(l => l.transactionHash);
-  const ts = new Date().toLocaleString('en-US', { hour12: false });
-
-  const handlePrint = () => window.print();
-
+  if (!manifest) return null;
+  const btnStyle: React.CSSProperties = { fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', height: 32, padding: '0 16px', border: '1px solid var(--line-2)', borderRadius: 6, cursor: 'pointer' };
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <style>{`
         @media print {
-          body > *:not(.receipt-print-root) { display: none !important; }
-          .receipt-print-root { position: fixed !important; inset: 0 !important; background: white !important; color: black !important; padding: 32px !important; font-family: monospace !important; }
-          .receipt-no-print { display: none !important; }
+          body * { visibility: hidden; }
+          .receipt-print-content, .receipt-print-content * { visibility: visible; }
+          .receipt-print-content { position: fixed; left: 50%; top: 20px; transform: translateX(-50%); }
         }
       `}</style>
-      <div className="receipt-print-root" style={{ background: 'var(--bg-1)', border: '1px solid var(--line-2)', borderRadius: 12, width: '100%', maxWidth: 520, boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', borderBottom: '1px solid var(--line-1)', background: 'var(--bg-2)', borderRadius: '12px 12px 0 0' }}>
-          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF5F57' }} />
-          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#FFBD2E' }} />
-          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#28C840' }} />
-          <span style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.10em', marginLeft: 6 }}>execution receipt · {manifest?.workflow_id || 'unknown'}</span>
-          <button className="receipt-no-print" onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--fg-4)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}>×</button>
-        </div>
-        <div style={{ padding: '20px 20px 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, padding: '10px 14px', background: errorCount > 0 ? 'rgba(244,113,116,0.08)' : 'rgba(52,211,153,0.08)', border: `1px solid ${errorCount > 0 ? 'rgba(244,113,116,0.25)' : 'rgba(52,211,153,0.25)'}`, borderRadius: 8 }}>
-            <span style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 18 }}>{errorCount > 0 ? '✗' : '✓'}</span>
-            <div>
-              <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 12, fontWeight: 600, color: errorCount > 0 ? 'var(--err-500)' : 'var(--ok-500)' }}>{errorCount > 0 ? 'EXECUTION FAILED' : 'EXECUTION COMPLETE'}</div>
-              <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-4)', marginTop: 2 }}>{ts}</div>
-            </div>
-          </div>
-          {[
-            { k: 'Workflow ID', v: manifest?.workflow_id || '—' },
-            { k: 'Nodes', v: String(manifest?.nodes.length ?? '—') },
-            { k: 'Edges', v: String(manifest?.edges.length ?? '—') },
-            { k: 'Log events', v: String(logs.length) },
-            { k: 'Successful', v: String(successCount), hi: !errorCount },
-            { k: 'Errors', v: String(errorCount), hi: errorCount > 0 },
-          ].map(row => (
-            <div key={row.k} style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: 8, padding: '5px 0', borderBottom: '1px solid var(--line-1)', fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11 }}>
-              <span style={{ color: 'var(--fg-4)', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', alignSelf: 'center' }}>{row.k}</span>
-              <span style={{ color: (row as any).hi ? 'var(--ok-500)' : 'var(--fg-1)' }}>{row.v}</span>
-            </div>
-          ))}
-          {anchors.length > 0 && (
-            <div style={{ marginTop: 12 }}>
-              <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--fg-4)', marginBottom: 6 }}>Anchor Transactions</div>
-              {anchors.map(l => (
-                <div key={l.id} style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--anchor-300)', padding: '2px 0' }}>
-                  ✓ {l.transactionHash?.slice(0, 18)}…
-                  {l.transactionHash && (
-                    <a href={`https://explorer.0g.ai/tx/${l.transactionHash}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--input-300)', marginLeft: 8 }}>↗ explorer</a>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="receipt-no-print" style={{ display: 'flex', gap: 8, padding: '12px 20px 16px', borderTop: '1px solid var(--line-1)' }}>
-          <button onClick={handlePrint} style={{ flex: 1, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.06em', height: 32, border: '1px solid var(--line-2)', borderRadius: 6, background: 'var(--bg-2)', color: 'var(--fg-1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>⎙ print / save pdf</button>
-          <button onClick={onClose} style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.06em', height: 32, padding: '0 16px', border: '1px solid var(--line-2)', borderRadius: 6, background: 'transparent', color: 'var(--fg-3)', cursor: 'pointer' }}>close</button>
-        </div>
+      <div className="receipt-print-content">
+        <ExecutionReceipt manifest={manifest} logs={logs} />
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={() => window.print()} style={{ ...btnStyle, background: 'var(--bg-2)', color: 'var(--fg-1)' }}>⎙ print / save pdf</button>
+        <button onClick={onClose} style={{ ...btnStyle, background: 'transparent', color: 'var(--fg-4)' }}>close</button>
       </div>
     </div>
   );

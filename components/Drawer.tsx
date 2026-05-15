@@ -49,7 +49,7 @@ function ReceiptDash() {
   return <div style={{ fontSize: 9, color: 'var(--fg-4)', letterSpacing: '0.06em', padding: '6px 0', userSelect: 'none' }}>{DASH}</div>;
 }
 
-function ExecutionReceipt({ manifest, logs }: { manifest: Manifest; logs: ExecutionLog[] }) {
+export function ExecutionReceipt({ manifest, logs }: { manifest: Manifest; logs: ExecutionLog[] }) {
   const hasLogs = logs.length > 0;
   const firstTs = hasLogs ? new Date(logs[0].timestamp) : null;
   const lastTs  = hasLogs ? new Date(logs[logs.length - 1].timestamp) : null;

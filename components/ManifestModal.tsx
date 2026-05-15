@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Manifest } from '@/lib/manifestCompiler';
 
 interface ManifestModalProps {
@@ -10,6 +11,7 @@ interface ManifestModalProps {
 }
 
 export function ManifestModal({ manifest, isOpen, onClose, onExecute }: ManifestModalProps) {
+  const [copied, setCopied] = useState(false);
   if (!isOpen || !manifest) return null;
 
   const handleDownload = () => {
@@ -26,6 +28,8 @@ export function ManifestModal({ manifest, isOpen, onClose, onExecute }: Manifest
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(manifest, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
 
   const handleExecute = () => {
@@ -61,7 +65,7 @@ export function ManifestModal({ manifest, isOpen, onClose, onExecute }: Manifest
             onClick={handleCopy}
             className="bg-bg-3 hover:bg-bg-4 text-fg-1 px-4 py-2 rounded-md text-sm transition-colors"
           >
-            Copy
+            {copied ? '✓ Copied' : 'Copy'}
           </button>
           <button
             onClick={handleDownload}

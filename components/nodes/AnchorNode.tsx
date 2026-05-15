@@ -15,8 +15,6 @@ export function AnchorNode({ id, data }: { id: string; data: any }) {
     setNodes(nds => nds.map(n => n.id === id ? { ...n, data: { ...n.data, ...patch } } : n));
   }, [id, setNodes]);
 
-  const nodeId = (data.nodeId || 'AN·02') + ' · 0G STORAGE';
-
   return (
     <div className={`node node-anchor ${data.selected ? 'selected' : ''}`} style={{ width: 260 }}>
       <div className="node-head">
@@ -41,7 +39,7 @@ export function AnchorNode({ id, data }: { id: string; data: any }) {
           ) : (
             <span className="name node-editable" title="Double-click to rename" onDoubleClick={() => setEditingName(true)}>{name}</span>
           )}
-          <span className="id">{nodeId}</span>
+
         </div>
         <button onClick={e => { e.stopPropagation(); setNodes(nds => nds.filter(n => n.id !== id)); setEdges(eds => eds.filter(e => e.source !== id && e.target !== id)); }} style={{ background: 'none', border: 'none', padding: '0 2px', cursor: 'pointer', color: 'var(--fg-4)', fontSize: 14, lineHeight: 1, flexShrink: 0 }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--err-500)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--fg-4)')} title="Delete node">×</button>
       </div>

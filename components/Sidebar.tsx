@@ -39,7 +39,7 @@ export function Sidebar({ onLoadTemplate }: SidebarProps) {
         <p className="eyebrow" style={{ marginTop: 8 }}>Visual Agent Builder</p>
       </div>
 
-      <div className="sidebar-section" style={{ flex: paletteOpen ? 1 : 0, overflow: 'auto', minHeight: 0 }}>
+      <div className="sidebar-section" style={{ flex: paletteOpen ? 1 : '0 0 auto', overflow: paletteOpen ? 'auto' : 'hidden', minHeight: 0 }}>
         <button onClick={() => setPaletteOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', marginBottom: paletteOpen ? 8 : 0 }}>
           <span className="eyebrow">Node Palette</span>
           <ChevronIcon open={paletteOpen} />
@@ -68,7 +68,7 @@ export function Sidebar({ onLoadTemplate }: SidebarProps) {
         </div>}
       </div>
 
-      <div className="sidebar-section" style={{ borderTop: '1px solid var(--line-2)', flexShrink: 0 }}>
+      <div className="sidebar-section" style={{ borderTop: '1px solid var(--line-2)', flex: '0 0 auto' }}>
         <button onClick={() => setTemplatesOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', marginBottom: templatesOpen ? 10 : 0 }}>
           <span className="eyebrow">Templates</span>
           <ChevronIcon open={templatesOpen} />
