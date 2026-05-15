@@ -23,18 +23,14 @@ Open [http://localhost:3000](http://localhost:3000), connect your wallet, and st
 
 ## Environment variables
 
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `OG_ROUTER_API_KEY` | yes | — | API key from the 0G dashboard |
-| `OG_RPC_URL` | no | `https://evmrpc-testnet.0g.ai` | 0G EVM RPC (server-side) |
-| `NEXT_PUBLIC_OG_RPC_URL` | no | `https://evmrpc-testnet.0g.ai` | 0G EVM RPC (browser — storage) |
-| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | no | `demo-project-id` | WalletConnect project ID |
-| `NEXT_PUBLIC_REGISTRY_ADDRESS_16602` | no | — | WorkflowRegistry address on Galileo |
-| `NEXT_PUBLIC_REGISTRY_ADDRESS_16661` | no | — | WorkflowRegistry address on Aristotle |
-| `OG_PROVIDER_URL` | no | — | Override compute endpoint (advanced) |
-| `INSTRUCT_KEY` | no | — | Key for override endpoint |
+| Variable | Required | Description |
+|---|---|---|
+| `OG_ROUTER_API_KEY` | yes | API key from the 0G compute dashboard |
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | no | WalletConnect project ID (falls back to demo mode) |
+| `NEXT_PUBLIC_REGISTRY_ADDRESS_16602` | no | WorkflowRegistry on Galileo testnet — `0xC9B54F8437f87D3af6926876d32874f453121b7d` |
+| `NEXT_PUBLIC_REGISTRY_ADDRESS_16661` | no | WorkflowRegistry on Aristotle mainnet — `0x2Dade1D970431445d1e9509751015c5F9C7F1F50` |
 
-No server private key needed. Storage, memory, and registry writes are signed by the user's connected wallet.
+All RPC endpoints and router URLs are resolved per-chain from `lib/networks.ts` — no manual URL overrides needed. No server private key required; storage and registry writes are signed by the user's connected wallet.
 
 ## Node types
 
@@ -49,20 +45,23 @@ Chain node outputs with `{{nodeId.output.field}}` in any parameter.
 
 ## Networks
 
-| Network | Chain ID | Router | Models |
+| Network | Chain ID | Router | Registry |
 |---|---|---|---|
-| Galileo Testnet | 16602 | `router-api-testnet.integratenetwork.work` | `qwen/qwen-2.5-7b-instruct` |
-| Aristotle Mainnet | 16661 | `router-api.0g.ai` | `zai-org/GLM-5.1-FP8`, `deepseek-v4-pro`, `0GM-1.0-35B-A3B`, `qwen/qwen3-vl-30b-a3b-instruct` |
+| Galileo Testnet | 16602 | `router-api-testnet.integratenetwork.work/v1` | `0xC9B54F8437f87D3af6926876d32874f453121b7d` |
+| Aristotle Mainnet | 16661 | `router-api.0g.ai/v1` | `0x2Dade1D970431445d1e9509751015c5F9C7F1F50` |
+
+**Mainnet models:** `zai-org/GLM-5.1-FP8`, `deepseek-v4-pro`, `0GM-1.0-35B-A3B`, `qwen/qwen3-vl-30b-a3b-instruct`
+**Testnet models:** `qwen/qwen-2.5-7b-instruct`
 
 ## Verifying a workflow
 
 After execution, open the **Verify** tab in the execution drawer, paste the `workflow_id`, and hit Verify. The registry returns:
-- `manifestHash` — SHA-256 of the compiled manifest
+- `manifestHash` — keccak256 of the compiled manifest
 - `storageKey` — 0G Storage root hash of the output
 - `executionCount` — total runs recorded on-chain
 - `execTxHash` — 0G explorer link for the latest execution
 
-Requires `NEXT_PUBLIC_REGISTRY_ADDRESS_16602` (deploy `scripts/deploy-registry.cjs` first).
+Both registry contracts are deployed and live. Verification works on testnet and mainnet.
 
 ## TEE attestation
 
@@ -90,7 +89,7 @@ Requires `.env` with `OG_RPC_URL`. See [EXECUTOR.md](./EXECUTOR.md) for full doc
 ```
 L1  Compute       0G Router API + verify_tee
 L2  Storage/DA    @0gfoundation/0g-ts-sdk (merkle tree)
-L3  Settlement    WorkflowRegistry.sol on 0G Chain
+L3  Settlement    WorkflowRegistry.sol on 0G Chain (testnet + mainnet)
 L4  Identity      Wagmi + RainbowKit (chain-aware)
 L5  Inference     ManifestExecutor + variableResolver
 L6  Protocol      Manifest schema (workflow_id, chain_id, nodes[], edges[])
