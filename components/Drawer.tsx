@@ -189,14 +189,36 @@ function ExecutionReceipt({ manifest, logs }: { manifest: Manifest; logs: Execut
   );
 }
 
+interface RecentRun {
+  id: string;
+  timestamp: string;
+  workflowName: string;
+  success: boolean;
+  logCount: number;
+}
+
+function relTime(ts: string): string {
+  const s = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  return `${Math.floor(s / 3600)}h ago`;
+}
+
 interface DrawerProps {
   logs: ExecutionLog[];
   manifest: Manifest | null;
   isRunning: boolean;
+  recentRuns?: RecentRun[];
+  onSelectRun?: (id: string, timestamp: string) => void;
+  selectedRunKey?: string | null;
+  activeTab?: 'log' | 'manifest' | 'verify' | 'history';
+  onTabChange?: (t: 'log' | 'manifest' | 'verify' | 'history') => void;
 }
 
-export function Drawer({ logs, manifest, isRunning }: DrawerProps) {
-  const [tab, setTab] = useState<'receipt' | 'logs' | 'json' | 'verify'>('logs');
+export function Drawer({ logs, manifest, isRunning, recentRuns = [], onSelectRun, selectedRunKey, activeTab, onTabChange }: DrawerProps) {
+  const [localTab, setLocalTab] = useState<'log' | 'manifest' | 'verify' | 'history'>('log');
+  const tab = activeTab ?? localTab;
+  const setTab = (t: 'log' | 'manifest' | 'verify' | 'history') => { setLocalTab(t); onTabChange?.(t); };
   const [collapsed, setCollapsed] = useState(false);
   const chainId = useChainId();
   const { address } = useAccount();
@@ -214,7 +236,7 @@ export function Drawer({ logs, manifest, isRunning }: DrawerProps) {
       <button aria-label="Toggle drawer" className="drawer-handle" onClick={() => setCollapsed(c => !c)} style={{ border: 0, padding: 0 }} />
       <div className="drawer-head">
         <div className="drawer-tabs">
-          {(['receipt', 'logs', 'json', 'verify'] as const).map(t => (
+          {(['log', 'manifest', 'verify', 'history'] as const).map(t => (
             <button key={t} className={`drawer-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
               {t[0].toUpperCase() + t.slice(1)}
             </button>
@@ -240,17 +262,7 @@ export function Drawer({ logs, manifest, isRunning }: DrawerProps) {
         <div className="drawer-body">
           <div className="drawer-main">
 
-            {tab === 'receipt' && (
-              <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 4, paddingBottom: 16 }}>
-                {!manifest ? (
-                  <div style={{ paddingTop: 24 }} className="drawer-empty">Deploy a workflow to see the receipt.</div>
-                ) : (
-                  <ExecutionReceipt manifest={manifest} logs={logs} />
-                )}
-              </div>
-            )}
-
-            {tab === 'logs' && (
+            {tab === 'log' && (
               <div className="dp">
                 {logs.length === 0 ? (
                   <div className="dp-row dp-log">
@@ -285,7 +297,7 @@ export function Drawer({ logs, manifest, isRunning }: DrawerProps) {
               </div>
             )}
 
-            {tab === 'json' && (
+            {tab === 'manifest' && (
               <div className="dp">
                 <pre className="dp-json">
                   {manifest ? JSON.stringify(manifest, null, 2) : '// Deploy a workflow to see its compiled JSON manifest.'}
@@ -346,6 +358,36 @@ export function Drawer({ logs, manifest, isRunning }: DrawerProps) {
                 )}
               </div>
             )}
+
+            {tab === 'history' && (
+              <div style={{ padding: '4px 0' }}>
+                {recentRuns.length === 0 ? (
+                  <div className="drawer-empty">No runs yet — deploy a workflow.</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {recentRuns.map(run => {
+                      const key = run.id + run.timestamp;
+                      const isSelected = selectedRunKey === key;
+                      return (
+                        <div
+                          key={key}
+                          onClick={() => onSelectRun?.(run.id, run.timestamp)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 10, color: 'var(--fg-3)', letterSpacing: '0.08em', minWidth: 0, cursor: onSelectRun ? 'pointer' : 'default', padding: '4px 8px', borderRadius: 4, background: isSelected ? 'var(--bg-2)' : 'transparent', border: isSelected ? '1px solid var(--line-2)' : '1px solid transparent', transition: 'background 120ms, border-color 120ms' }}
+                          onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-2)'; }}
+                          onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
+                        >
+                          <span style={{ width: 5, height: 5, borderRadius: '50%', flexShrink: 0, background: run.success ? 'var(--ok-500)' : 'var(--err-500)', boxShadow: run.success ? '0 0 5px var(--ok-glow)' : 'none' }} />
+                          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isSelected ? 'var(--fg-1)' : 'var(--fg-2)' }}>{run.workflowName}</span>
+                          <span style={{ color: 'var(--fg-4)', flexShrink: 0 }}>{relTime(run.timestamp)}</span>
+                          <span style={{ background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderRadius: 3, padding: '1px 5px', color: 'var(--fg-4)', flexShrink: 0 }}>{run.logCount}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
 
           </div>
         </div>
