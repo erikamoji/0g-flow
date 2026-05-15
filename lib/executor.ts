@@ -16,7 +16,6 @@ export interface ExecutionResult {
   logs: any[];
 }
 
-const OG_STORAGE_INDEXER = process.env.OG_STORAGE_INDEXER || 'https://indexer-storage-testnet-turbo.0g.ai';
 
 class ManifestExecutor {
   private manifest: Manifest;
@@ -209,7 +208,7 @@ class ManifestExecutor {
         if (!rootHash) throw new Error('memory_store read mode requires root_hash');
 
         this.logger.log('debug', `Fetching memory from 0G Storage: ${rootHash}`, { key });
-        const response = await axios.get(`${OG_STORAGE_INDEXER}/file`, {
+        const response = await axios.get(`${getNetwork(this.manifest.chain_id).storageIndexer}/file`, {
           params: { root: rootHash },
           timeout: 15000,
         });
