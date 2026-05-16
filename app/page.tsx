@@ -243,7 +243,7 @@ function LandingPage() {
         /* SECTION HEADS */
         .lp-sect-head { display: flex; flex-direction: column; gap: 18px; max-width: 680px; margin-bottom: 64px; }
         /* ARCHETYPE CARDS */
-        .lp-nodes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .lp-nodes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
         .lp-archetype { background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 14px; padding: 24px; position: relative; overflow: hidden; transition: transform 350ms cubic-bezier(0.2,0.8,0.2,1), box-shadow 350ms; animation: lp-float var(--float-dur, 6s) ease-in-out infinite var(--float-delay, 0s); }
         .lp-archetype:hover { transform: translateY(-6px) !important; animation-play-state: paused; }
         @keyframes lp-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
