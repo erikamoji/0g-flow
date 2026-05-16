@@ -2,7 +2,7 @@
 
 > Visual drag-and-drop workflow builder that routes AI inference through 0G Compute, stores outputs on 0G Storage, and anchors provenance on 0G Chain.
 
-**[Live Demo](https://0g-flow.vercel.app/)** · **[Slide Deck](https://0g-flow-deck.netlify.app)**
+**[Live Demo](https://0g-flow.vercel.app/)** · **[Slide Deck](https://0g-flow-deck.netlify.app)** · **[Demo Video]([https://0g-flow-deck.netlify.app](https://www.youtube.com/watch?v=3L0ygEANUPI))**
 
 ---
 
