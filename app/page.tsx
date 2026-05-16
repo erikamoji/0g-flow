@@ -250,20 +250,24 @@ function LandingPage() {
         .lp-archetype.lp-input  { --float-dur: 6.2s; --float-delay: 0s; }
         .lp-archetype.lp-logic  { --float-dur: 7.1s; --float-delay: 0.8s; }
         .lp-archetype.lp-anchor { --float-dur: 6.6s; --float-delay: 1.6s; }
+        .lp-archetype.lp-memory { --float-dur: 7.4s; --float-delay: 2.4s; }
         .lp-archetype::after { content: ""; position: absolute; inset: -1px; border-radius: 14px; pointer-events: none; opacity: 0; transition: opacity 300ms; }
         .lp-archetype.lp-input::after  { box-shadow: var(--glow-input); }
         .lp-archetype.lp-logic::after  { box-shadow: var(--glow-logic); }
         .lp-archetype.lp-anchor::after { box-shadow: var(--glow-anchor); }
+        .lp-archetype.lp-memory::after { box-shadow: var(--glow-memory); }
         .lp-archetype:hover::after { opacity: 1; }
         .lp-a-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; margin-bottom: 18px; }
         .lp-a-icon svg { width: 20px; height: 20px; }
         .lp-archetype.lp-input  .lp-a-icon { background: rgba(42,123,255,0.12); color: var(--input-300); }
         .lp-archetype.lp-logic  .lp-a-icon { background: rgba(124,92,255,0.14); color: var(--logic-300); }
         .lp-archetype.lp-anchor .lp-a-icon { background: rgba(16,185,129,0.14); color: var(--anchor-300); }
+        .lp-archetype.lp-memory .lp-a-icon { background: rgba(111,204,58,0.14); color: var(--memory-300); }
         .lp-a-eyebrow { font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px; }
         .lp-archetype.lp-input  .lp-a-eyebrow { color: var(--input-300); }
         .lp-archetype.lp-logic  .lp-a-eyebrow { color: var(--logic-300); }
         .lp-archetype.lp-anchor .lp-a-eyebrow { color: var(--anchor-300); }
+        .lp-archetype.lp-memory .lp-a-eyebrow { color: var(--memory-300); }
         .lp-archetype h3 { font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 8px; color: var(--fg-1); }
         .lp-archetype p { font-size: 13.5px; line-height: 1.55; color: var(--fg-2); margin: 0 0 16px; }
         .lp-a-meta { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid var(--line-1); }
