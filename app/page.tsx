@@ -732,7 +732,7 @@ function Dashboard() {
   const [templateNodes, setTemplateNodes] = useState<Node[] | null>(null);
   const [templateEdges, setTemplateEdges] = useState<Edge[] | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
-  const [drawerTab, setDrawerTab] = useState<'log' | 'manifest' | 'verify' | 'history'>('log');
+  const [drawerTab, setDrawerTab] = useState<'log' | 'manifest' | 'history'>('log');
 
   useEffect(() => {
     try {
