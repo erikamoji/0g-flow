@@ -48,6 +48,9 @@
 
   --ok-500:    #34D399;
   --ok-glow:   rgba(52,211,153,0.55);
+  --ok-bg:     rgba(52,211,153,0.08);
+  --ok-ring:   rgba(52,211,153,0.22);
+  --ok-border: rgba(52,211,153,0.30);
   --idle-500:  #F5B544;
   --idle-glow: rgba(245,181,68,0.50);
   --warn-500:  #F08A3A;
@@ -77,6 +80,10 @@
   --glow-logic:  0 0 0 1px rgba(255,149,200,0.30), 0 0 24px -2px var(--logic-glow);
   --glow-anchor: 0 0 0 1px rgba(255,224,102,0.28), 0 0 24px -2px var(--anchor-glow);
   --glow-memory: 0 0 0 1px rgba(182,255,143,0.28), 0 0 24px -2px var(--memory-glow);
+
+  --nav-bg:          rgba(7,9,12,0.50);
+  --nav-bg-scrolled: rgba(7,9,12,0.82);
+  --modal-backdrop:  rgba(0,0,0,0.72);
 }
 
 /* ── Light / paper theme ─────────────────────────────────────── */

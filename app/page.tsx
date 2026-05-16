@@ -149,14 +149,14 @@ function LandingPage() {
     <div style={{ background: 'var(--bg-0)', color: 'var(--fg-1)', fontFamily: 'var(--font-inter-tight, sans-serif)', WebkitFontSmoothing: 'antialiased' }}>
       <style>{`
         /* NAV */
-        .lp-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(7,9,12,0.50); border-bottom: 1px solid transparent; transition: border-color 250ms, background 250ms; gap: 16px; }
-        .lp-nav.lp-scrolled { border-bottom-color: var(--line-2); background: rgba(7,9,12,0.82); }
+        .lp-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: var(--nav-bg); border-bottom: 1px solid transparent; transition: border-color 250ms, background 250ms; gap: 16px; }
+        .lp-nav.lp-scrolled { border-bottom-color: var(--line-2); background: var(--nav-bg-scrolled); }
         .lp-nav-mark img { height: 26px; display: block; }
         .lp-nav-links { display: flex; gap: 28px; }
         .lp-nav-links a { font-size: 13px; color: var(--fg-3); text-decoration: none; transition: color 150ms; }
         .lp-nav-links a:hover { color: var(--fg-1); }
         /* Live block pill */
-        .lp-block-pill { font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.18); border-radius: 999px; padding: 4px 10px; color: var(--fg-3); white-space: nowrap; margin-left: auto; }
+        .lp-block-pill { font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; background: var(--ok-bg); border: 1px solid var(--ok-ring); border-radius: 999px; padding: 4px 10px; color: var(--fg-3); white-space: nowrap; margin-left: auto; }
         .lp-block-pill .lp-live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ok-500); box-shadow: 0 0 6px var(--ok-glow); animation: lp-live-pulse 2s ease-in-out infinite; flex-shrink: 0; }
         @keyframes lp-live-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; box-shadow: 0 0 10px var(--ok-glow); } }
         .lp-block-num { color: var(--ok-500); font-variant-numeric: tabular-nums; }
@@ -183,7 +183,7 @@ function LandingPage() {
         .lp-hero-l { display: flex; flex-direction: column; gap: 24px; position: relative; z-index: 1; }
         .lp-hero-r { position: relative; z-index: 1; }
         .lp-hero-grid { position: absolute; inset: 0; background-color: var(--bg-0); background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0); background-size: 22px 22px; mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 80%); pointer-events: none; }
-        .lp-hero-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 80% at 100% 50%, rgba(232,74,152,0.08) 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 0% 50%, rgba(240,193,58,0.06) 0%, transparent 50%); }
+        .lp-hero-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 80% at 100% 50%, var(--logic-bg) 0%, transparent 60%), radial-gradient(ellipse 50% 60% at 0% 50%, var(--anchor-bg) 0%, transparent 50%); }
         .lp-hero-inner { text-align: center; max-width: 860px; position: relative; display: flex; flex-direction: column; align-items: center; gap: 0; }
         .lp-hero-sub { color: var(--fg-3); margin: 24px auto 0; max-width: 480px; font-size: 17px; line-height: 1.6; }
         /* Hero verb strip */
@@ -202,7 +202,7 @@ function LandingPage() {
         /* Hero meta */
         .lp-hero-meta { display: flex; align-items: center; gap: 8px; font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; color: var(--fg-4); letter-spacing: 0.08em; }
         /* HERO TERMINAL */
-        .lp-hero-terminal { margin-top: 40px; width: 100%; max-width: 560px; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; box-shadow: 0 24px 60px -12px rgba(0,0,0,0.5), 0 0 40px -16px rgba(42,123,255,0.15); text-align: left; }
+        .lp-hero-terminal { margin-top: 40px; width: 100%; max-width: 560px; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow-3), 0 0 40px -16px var(--input-glow); text-align: left; }
         .lp-ht-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line-2); background: var(--bg-2); }
         .lp-ht-dot { width: 10px; height: 10px; border-radius: 50%; }
         .lp-ht-label { margin-left: auto; font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-4); }
@@ -223,7 +223,7 @@ function LandingPage() {
         .lp-ht-l7 { animation: lp-ht-fade 0.3s ease forwards 2.9s; }
         @keyframes lp-ht-fade { to { opacity: 1; } }
         /* COPY TOAST */
-        .lp-copy-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ok-500); background: var(--bg-2); border: 1px solid rgba(52,211,153,0.3); border-radius: 999px; padding: 6px 16px; z-index: 100; animation: lp-toast-in 0.2s ease; pointer-events: none; display: flex; align-items: center; gap: 6px; }
+        .lp-copy-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ok-500); background: var(--bg-2); border: 1px solid var(--ok-border); border-radius: 999px; padding: 6px 16px; z-index: 100; animation: lp-toast-in 0.2s ease; pointer-events: none; display: flex; align-items: center; gap: 6px; }
         .lp-copy-toast::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--ok-500); box-shadow: 0 0 6px var(--ok-glow); display: inline-block; }
         @keyframes lp-toast-in { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         .lp-scroll-arrow { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--fg-4); cursor: pointer; background: none; border: none; padding: 0; animation: lp-bounce 2.2s ease-in-out infinite; }
@@ -259,10 +259,10 @@ function LandingPage() {
         .lp-archetype:hover::after { opacity: 1; }
         .lp-a-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; margin-bottom: 18px; }
         .lp-a-icon svg { width: 20px; height: 20px; }
-        .lp-archetype.lp-input  .lp-a-icon { background: rgba(42,123,255,0.12); color: var(--input-300); }
-        .lp-archetype.lp-logic  .lp-a-icon { background: rgba(124,92,255,0.14); color: var(--logic-300); }
-        .lp-archetype.lp-anchor .lp-a-icon { background: rgba(16,185,129,0.14); color: var(--anchor-300); }
-        .lp-archetype.lp-memory .lp-a-icon { background: rgba(111,204,58,0.14); color: var(--memory-300); }
+        .lp-archetype.lp-input  .lp-a-icon { background: var(--input-bg);  color: var(--input-300); }
+        .lp-archetype.lp-logic  .lp-a-icon { background: var(--logic-bg);  color: var(--logic-300); }
+        .lp-archetype.lp-anchor .lp-a-icon { background: var(--anchor-bg); color: var(--anchor-300); }
+        .lp-archetype.lp-memory .lp-a-icon { background: var(--memory-bg); color: var(--memory-300); }
         .lp-a-eyebrow { font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px; }
         .lp-archetype.lp-input  .lp-a-eyebrow { color: var(--input-300); }
         .lp-archetype.lp-logic  .lp-a-eyebrow { color: var(--logic-300); }
@@ -286,9 +286,9 @@ function LandingPage() {
         .lp-demo-node.lp-logic  { left: 39%; top: 35%; box-shadow: var(--glow-logic);  transform: translateY(12px); }
         .lp-demo-node.lp-anchor { left: 72%; top: 35%; box-shadow: var(--glow-anchor); transform: translateX(12px); }
         .lp-demo-node.in.lp-input, .lp-demo-node.in.lp-logic, .lp-demo-node.in.lp-anchor { transform: none; }
-        .lp-demo-node.lp-input  .lp-ic { background: rgba(42,123,255,0.12); color: var(--input-300); }
-        .lp-demo-node.lp-logic  .lp-ic { background: rgba(124,92,255,0.14); color: var(--logic-300); }
-        .lp-demo-node.lp-anchor .lp-ic { background: rgba(16,185,129,0.14); color: var(--anchor-300); }
+        .lp-demo-node.lp-input  .lp-ic { background: var(--input-bg);  color: var(--input-300); }
+        .lp-demo-node.lp-logic  .lp-ic { background: var(--logic-bg);  color: var(--logic-300); }
+        .lp-demo-node.lp-anchor .lp-ic { background: var(--anchor-bg); color: var(--anchor-300); }
         .lp-demo-node.lp-input  .lp-st { background: var(--ok-500); box-shadow: 0 0 8px var(--ok-glow); }
         .lp-demo-node.lp-logic  .lp-st { background: var(--logic-300); box-shadow: 0 0 10px var(--logic-glow); animation: lp-pulse-logic 1.4s ease-in-out infinite; }
         .lp-demo-node.lp-anchor .lp-st { background: var(--ok-500); box-shadow: 0 0 8px var(--ok-glow); }
@@ -305,13 +305,13 @@ function LandingPage() {
         .lp-canvas-demo.in .lp-demo-handle { opacity: 1; }
         .lp-demo-handle .lp-ring { fill: var(--bg-1); }
         .lp-demo-meta { position: absolute; left: 24px; bottom: 20px; display: flex; gap: 16px; align-items: center; font-family: var(--font-jetbrains-mono, monospace); font-size: 10.5px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-3); }
-        .lp-demo-meta .lp-pill { padding: 4px 10px; border-radius: 999px; background: rgba(52,211,153,0.10); border: 1px solid rgba(52,211,153,0.30); color: var(--ok-500); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .lp-demo-meta .lp-pill { padding: 4px 10px; border-radius: 999px; background: var(--ok-bg); border: 1px solid var(--ok-border); color: var(--ok-500); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
         .lp-demo-meta .lp-pill .lp-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok-500); box-shadow: 0 0 8px var(--ok-glow); }
         .lp-demo-tx { position: absolute; right: 24px; bottom: 20px; font-family: var(--font-jetbrains-mono, monospace); font-size: 13px; color: var(--input-300); white-space: nowrap; cursor: pointer; }
         .lp-demo-tx:hover { color: var(--input-50); }
         /* RECEIPT */
         .lp-receipt-row { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center; }
-        .lp-receipt { width: 100%; max-width: 340px; font-family: var(--font-jetbrains-mono, monospace); background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 4px; box-shadow: var(--shadow-3), 0 0 60px -20px rgba(93,227,165,0.12); overflow: hidden; position: relative; }
+        .lp-receipt { width: 100%; max-width: 340px; font-family: var(--font-jetbrains-mono, monospace); background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 4px; box-shadow: var(--shadow-3), 0 0 60px -20px var(--ok-bg); overflow: hidden; position: relative; }
         .lp-receipt::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--brand-grad); }
         .lp-receipt-header { padding: 20px 20px 16px; text-align: center; border-bottom: 1px dashed var(--line-3); }
         .lp-receipt-store { font-size: 14px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-1); }
@@ -334,9 +334,9 @@ function LandingPage() {
         .lp-receipt-value.em { color: var(--anchor-300); }
         .lp-receipt-divider { border: none; border-top: 1px dashed var(--line-3); margin: 4px 0; }
         .lp-receipt-footer { padding: 12px 20px 18px; text-align: center; }
-        .lp-receipt-status { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ok-500); background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.22); border-radius: 999px; padding: 5px 12px; animation: lp-receipt-glow 2.5s ease-in-out infinite; }
+        .lp-receipt-status { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ok-500); background: var(--ok-bg); border: 1px solid var(--ok-ring); border-radius: 999px; padding: 5px 12px; animation: lp-receipt-glow 2.5s ease-in-out infinite; }
         .lp-receipt-status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ok-500); box-shadow: 0 0 6px var(--ok-glow); }
-        @keyframes lp-receipt-glow { 0%, 100% { box-shadow: 0 0 0 rgba(52,211,153,0); } 50% { box-shadow: 0 0 16px rgba(52,211,153,0.18); } }
+        @keyframes lp-receipt-glow { 0%, 100% { box-shadow: none; } 50% { box-shadow: 0 0 16px var(--ok-ring); } }
         /* STATEMENT */
         .lp-statement { text-align: center; padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
         .lp-statement .lp-h2-stmt { font-size: clamp(36px, 5.5vw, 76px); font-weight: 600; line-height: 1.1; letter-spacing: -0.025em; font-family: var(--font-inter-tight, sans-serif); }
@@ -522,10 +522,10 @@ function LandingPage() {
             <svg className="lp-demo-edges">
               <defs>
                 <linearGradient id="lp-e1" x1="0" x2="1" y1="0" y2="0">
-                  <stop offset="0" stopColor="#FFB36F" /><stop offset="1" stopColor="#FF95C8" />
+                  <stop offset="0" stopColor="var(--input-300)" /><stop offset="1" stopColor="var(--logic-300)" />
                 </linearGradient>
                 <linearGradient id="lp-e2" x1="0" x2="1" y1="0" y2="0">
-                  <stop offset="0" stopColor="#FF95C8" /><stop offset="1" stopColor="#FFE066" />
+                  <stop offset="0" stopColor="var(--logic-300)" /><stop offset="1" stopColor="var(--anchor-300)" />
                 </linearGradient>
                 <filter id="lp-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
                   <feGaussianBlur stdDeviation="2" result="blur" />
@@ -535,31 +535,31 @@ function LandingPage() {
               <path id="lp-path-e1" className="lp-demo-edge lp-flow" pathLength={100} ref={edge1Ref} stroke="url(#lp-e1)" />
               <path id="lp-path-e2" className="lp-demo-edge lp-flow" pathLength={100} ref={edge2Ref} stroke="url(#lp-e2)" />
               {/* Particles on edge 1 */}
-              <circle ref={p1aRef} r={3} fill="#FFB36F" className="lp-particle">
+              <circle ref={p1aRef} r={3} fill="var(--input-300)" className="lp-particle">
                 <animateMotion dur="1.8s" repeatCount="indefinite" begin="1.3s">
                   <mpath href="#lp-path-e1" />
                 </animateMotion>
               </circle>
-              <circle ref={p1bRef} r={3} fill="#FF95C8" className="lp-particle">
+              <circle ref={p1bRef} r={3} fill="var(--logic-300)" className="lp-particle">
                 <animateMotion dur="1.8s" repeatCount="indefinite" begin="2.2s">
                   <mpath href="#lp-path-e1" />
                 </animateMotion>
               </circle>
               {/* Particles on edge 2 */}
-              <circle ref={p2aRef} r={3} fill="#FF95C8" className="lp-particle">
+              <circle ref={p2aRef} r={3} fill="var(--logic-300)" className="lp-particle">
                 <animateMotion dur="1.8s" repeatCount="indefinite" begin="1.7s">
                   <mpath href="#lp-path-e2" />
                 </animateMotion>
               </circle>
-              <circle ref={p2bRef} r={3} fill="#FFE066" className="lp-particle">
+              <circle ref={p2bRef} r={3} fill="var(--anchor-300)" className="lp-particle">
                 <animateMotion dur="1.8s" repeatCount="indefinite" begin="2.5s">
                   <mpath href="#lp-path-e2" />
                 </animateMotion>
               </circle>
-              <g className="lp-demo-handle" ref={hIoutRef}><circle className="lp-ring" r={4.5} stroke="#FFB36F" strokeWidth={1.5} /><circle r={1.75} fill="#FFB36F" /></g>
-              <g className="lp-demo-handle" ref={hLinRef}><circle className="lp-ring" r={4.5} stroke="#FF95C8" strokeWidth={1.5} /><circle r={1.75} fill="#FF95C8" /></g>
-              <g className="lp-demo-handle" ref={hLoutRef}><circle className="lp-ring" r={4.5} stroke="#FF95C8" strokeWidth={1.5} /><circle r={1.75} fill="#FF95C8" /></g>
-              <g className="lp-demo-handle" ref={hAinRef}><circle className="lp-ring" r={4.5} stroke="#FFE066" strokeWidth={1.5} /><circle r={1.75} fill="#FFE066" /></g>
+              <g className="lp-demo-handle" ref={hIoutRef}><circle className="lp-ring" r={4.5} stroke="var(--input-300)" strokeWidth={1.5} /><circle r={1.75} fill="var(--input-300)" /></g>
+              <g className="lp-demo-handle" ref={hLinRef}><circle className="lp-ring" r={4.5} stroke="var(--logic-300)" strokeWidth={1.5} /><circle r={1.75} fill="var(--logic-300)" /></g>
+              <g className="lp-demo-handle" ref={hLoutRef}><circle className="lp-ring" r={4.5} stroke="var(--logic-300)" strokeWidth={1.5} /><circle r={1.75} fill="var(--logic-300)" /></g>
+              <g className="lp-demo-handle" ref={hAinRef}><circle className="lp-ring" r={4.5} stroke="var(--anchor-300)" strokeWidth={1.5} /><circle r={1.75} fill="var(--anchor-300)" /></g>
             </svg>
             <div className="lp-demo-node lp-input" ref={inputNodeRef}>
               <div className="lp-row">
@@ -953,7 +953,7 @@ function Dashboard() {
               <div onClick={() => setChainMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 49 }} />
             )}
             {chainMenuOpen && (
-              <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 50, background: 'var(--bg-1)', border: '1px solid var(--line-2)', borderRadius: 8, overflow: 'hidden', minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
+              <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 50, background: 'var(--bg-1)', border: '1px solid var(--line-2)', borderRadius: 8, overflow: 'hidden', minWidth: 160, boxShadow: 'var(--shadow-2)' }}>
                 {([{ id: 16602, label: '0G GALILEO', sub: 'testnet' }, { id: 16661, label: '0G ARISTOTLE', sub: 'mainnet' }] as const).map(c => (
                   <button key={c.id} onClick={() => switchChain(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', background: c.id === chainId ? 'var(--bg-3)' : 'none', border: 'none', padding: '9px 14px', cursor: 'pointer', fontFamily: 'var(--font-jetbrains-mono, monospace)', textAlign: 'left' }}>
                     <span style={{ width: 5, height: 5, borderRadius: '50%', background: c.id === chainId ? 'var(--ok-500)' : 'var(--fg-4)', flexShrink: 0 }} />
@@ -1029,7 +1029,7 @@ function ReceiptModal({ manifest, logs, onClose }: { manifest: Manifest | null; 
   if (!manifest) return null;
   const btnStyle: React.CSSProperties = { fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', height: 32, padding: '0 16px', border: '1px solid var(--line-2)', borderRadius: 6, cursor: 'pointer' };
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'var(--modal-backdrop)', backdropFilter: 'blur(4px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <style>{`
         @media print {
           body * { visibility: hidden; }
