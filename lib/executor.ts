@@ -1,3 +1,4 @@
+import OpenAI from 'openai';
 import axios from 'axios';
 import { Manifest } from './manifestCompiler';
 import { ExecutionLogger } from './executionLogger';
@@ -91,40 +92,34 @@ class ManifestExecutor {
       const { model, instruction, data_source, sealed } = resolvedParams;
       const resolvedInput = typeof data_source === 'string' ? JSON.parse(data_source) : data_source;
 
-      const providerUrl = process.env.OG_PROVIDER_URL;
-      const instrKey = process.env.INSTRUCT_KEY;
-      const endpoint = (providerUrl && instrKey)
-        ? `${providerUrl}/v1/proxy/chat/completions`
-        : `${getNetwork(this.manifest.chain_id).routerApi}/chat/completions`;
-      const apiKey = (providerUrl && instrKey) ? instrKey : process.env.OG_ROUTER_API_KEY;
+      const endpoint = `${getNetwork(this.manifest.chain_id).routerApi}/chat/completions`;
+      const apiKey = this.manifest.chain_id === 16661
+        ? process.env.OG_ROUTER_API_KEY_16661
+        : process.env.OG_ROUTER_API_KEY_16602;
 
-      this.logger.log('debug', `Calling 0G Compute: ${model}${sealed ? ' · verify_tee: true' : ''}`, { input: resolvedInput });
+      this.logger.log('debug', `Calling 0G Compute: ${model}${sealed ? ' · verify_tee: true' : ''} · endpoint=${endpoint} · hasKey=${!!apiKey}`, { input: resolvedInput });
 
-      const response = await axios.post(
-        endpoint,
-        {
-          model: model,
-          messages: [
-            { role: 'system', content: instruction },
-            { role: 'user', content: JSON.stringify(resolvedInput) },
-          ],
-          temperature: 0.7,
-          max_tokens: 1024,
-          ...(sealed ? { verify_tee: true } : {}),
-        },
-        {
-          timeout: 30000,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}),
-          },
-        }
-      );
+      const ogClient = new OpenAI({
+        baseURL: endpoint.replace('/chat/completions', ''),
+        apiKey: apiKey || 'no-key',
+        timeout: 30000,
+      });
 
-      const output = response.data.choices?.[0]?.message?.content || '';
-      const trace = response.data.x_0g_trace || {};
+      const response = await ogClient.chat.completions.create({
+        model,
+        messages: [
+          { role: 'system', content: instruction },
+          { role: 'user', content: JSON.stringify(resolvedInput) },
+        ],
+        temperature: 0.7,
+        max_tokens: 1024,
+        ...((sealed ? { verify_tee: true } : {}) as object),
+      });
+
+      const output = response.choices?.[0]?.message?.content || '';
+      const trace = (response as any).x_0g_trace || {};
       const teeVerified = trace.tee_verified ?? null;
-      const chatId = (response.headers as any)['zg-res-key'] ?? response.data.id ?? null;
+      const chatId = (response as any)['zg-res-key'] ?? response.id ?? null;
 
       if (sealed) {
         const teeMsg =
@@ -153,8 +148,9 @@ class ManifestExecutor {
       this.successCount++;
       return result;
     } catch (error: any) {
-      const detail = error.response?.data ? JSON.stringify(error.response.data) : '';
-      const msg = detail ? `${error.message} — ${detail}` : error.message;
+      const status = error.status ?? error.response?.status;
+      const detail = error.error ? JSON.stringify(error.error) : (error.response?.data ? JSON.stringify(error.response.data) : '');
+      const msg = detail ? `[${status}] ${error.message} — ${detail}` : `[${status}] ${error.message}`;
       this.logger.nodeError(nodeId, node.type, msg);
       this.failureCount++;
       throw new Error(msg);
