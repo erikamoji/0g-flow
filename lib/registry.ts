@@ -81,13 +81,16 @@ export async function registerWorkflow(
   const [address] = await client.getAddresses();
   const manifestHash = keccak256(toBytes(manifestJson)) as `0x${string}`;
 
-  return client.writeContract({
+  const hash = await client.writeContract({
     address: network.registryAddress,
     abi: ABI,
     functionName: 'registerWorkflow',
     args: [workflowId, manifestHash, storageKey],
     account: address,
   });
+
+  await publicClient(chainId).waitForTransactionReceipt({ hash });
+  return hash;
 }
 
 export async function recordExecution(

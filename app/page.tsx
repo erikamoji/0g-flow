@@ -831,8 +831,9 @@ function Dashboard() {
       runSuccess = !!result.success;
 
       if (getNetwork(chainId).registryAddress) {
-        registerWorkflow(chainId, manifestToExecute.workflow_id, JSON.stringify(manifestToExecute), manifestToExecute.workflow_id)
-          .catch(() => {});
+        try {
+          await registerWorkflow(chainId, manifestToExecute.workflow_id, JSON.stringify(manifestToExecute), manifestToExecute.workflow_id);
+        } catch { /* non-critical */ }
       }
 
       if (!result.success) {
