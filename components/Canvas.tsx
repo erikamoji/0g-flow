@@ -49,7 +49,7 @@ const initialNodes: Node[] = [
     data: {
       name: 'Signal Analyzer',
       model: 'deepseek-chat-v3',
-      sealed: true,
+      sealed: false,
       nodeId: 'LX·01',
       instruction: 'Analyze the market data. Return BUY, SELL, or HOLD with a confidence score 0–100.',
     },

@@ -419,6 +419,7 @@ html, body {
 .dp-lvl.warn { color: var(--idle-500); }
 .dp-lvl.err  { color: var(--err-500); }
 .dp-msg { color: var(--fg-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dp-log.err .dp-msg, .dp-log.warn .dp-msg, .dp-log.info .dp-msg { white-space: normal; word-break: break-all; }
 .dp-msg a { color: var(--input-300); margin-left: 8px; text-decoration: none; }
 .dp-msg a:hover { text-decoration: underline; text-underline-offset: 2px; }
 .dp-json { padding: 10px 14px; color: var(--fg-1); white-space: pre; overflow-x: auto; margin: 0; font-family: inherit; font-size: inherit; line-height: inherit; }

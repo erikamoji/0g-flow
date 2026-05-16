@@ -9,6 +9,7 @@
     "execute": "ts-node scripts/execute-manifest.ts"
   },
   "dependencies": {
+    "@0gfoundation/0g-compute-ts-sdk": "^0.8.3",
     "@0gfoundation/0g-ts-sdk": "^1.2.8",
     "@0glabs/0g-ts-sdk": "^0.3.3",
     "@rainbow-me/rainbowkit": "^2.2.11",
@@ -16,6 +17,7 @@
     "axios": "^1.16.0",
     "dotenv": "^17.4.2",
     "next": "16.2.6",
+    "openai": "^6.37.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "reactflow": "^11.11.4",

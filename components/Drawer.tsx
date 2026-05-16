@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useChainId, useAccount } from 'wagmi';
 import type { Manifest } from '@/lib/manifestCompiler';
 import type { ExecutionLog } from '@/lib/executionLogger';
-import { getWorkflow, getLatestExecution } from '@/lib/registry';
 
 const CHAIN_NAMES: Record<number, string> = {
   16600: '0G TESTNET',
@@ -211,32 +209,22 @@ interface DrawerProps {
   recentRuns?: RecentRun[];
   onSelectRun?: (id: string, timestamp: string) => void;
   selectedRunKey?: string | null;
-  activeTab?: 'log' | 'manifest' | 'verify' | 'history';
-  onTabChange?: (t: 'log' | 'manifest' | 'verify' | 'history') => void;
+  activeTab?: 'log' | 'manifest' | 'history';
+  onTabChange?: (t: 'log' | 'manifest' | 'history') => void;
 }
 
 export function Drawer({ logs, manifest, isRunning, recentRuns = [], onSelectRun, selectedRunKey, activeTab, onTabChange }: DrawerProps) {
-  const [localTab, setLocalTab] = useState<'log' | 'manifest' | 'verify' | 'history'>('log');
+  const [localTab, setLocalTab] = useState<'log' | 'manifest' | 'history'>('log');
   const tab = activeTab ?? localTab;
-  const setTab = (t: 'log' | 'manifest' | 'verify' | 'history') => { setLocalTab(t); onTabChange?.(t); };
+  const setTab = (t: 'log' | 'manifest' | 'history') => { setLocalTab(t); onTabChange?.(t); };
   const [collapsed, setCollapsed] = useState(false);
-  const chainId = useChainId();
-  const { address } = useAccount();
-  const [verifyId, setVerifyId] = useState('');
-  const [verifyOwner, setVerifyOwner] = useState('');
-  const [verifying, setVerifying] = useState(false);
-  const [verifyResult, setVerifyResult] = useState<{
-    manifestHash: string; storageKey: string; createdAt: number; executionCount: number;
-    execTxHash: string; execStorageTx: string; execTimestamp: number;
-  } | null>(null);
-  const [verifyError, setVerifyError] = useState('');
 
   return (
     <section className={`drawer ${collapsed ? 'collapsed' : ''}`} style={{ height: collapsed ? 44 : 320 }}>
       <button aria-label="Toggle drawer" className="drawer-handle" onClick={() => setCollapsed(c => !c)} style={{ border: 0, padding: 0 }} />
       <div className="drawer-head">
         <div className="drawer-tabs">
-          {(['log', 'manifest', 'verify', 'history'] as const).map(t => (
+          {(['log', 'manifest', 'history'] as const).map(t => (
             <button key={t} className={`drawer-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
               {t[0].toUpperCase() + t.slice(1)}
             </button>
@@ -275,7 +263,7 @@ export function Drawer({ logs, manifest, isRunning, recentRuns = [], onSelectRun
                     const t = new Date(l.timestamp).toLocaleTimeString('en-US', { hour12: false });
                     const lvl = l.level === 'success' ? 'ok' : l.level === 'error' ? 'err' : l.level === 'warn' ? 'warn' : 'info';
                     return (
-                      <div key={l.id} className="dp-row dp-log">
+                      <div key={l.id} className={`dp-row dp-log ${lvl}`}>
                         <span className="dp-t">{t}</span>
                         <span className={`dp-lvl ${lvl}`}>{lvl.toUpperCase()}</span>
                         <span className="dp-msg">
@@ -305,59 +293,6 @@ export function Drawer({ logs, manifest, isRunning, recentRuns = [], onSelectRun
               </div>
             )}
 
-            {tab === 'verify' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
-                  <div className="drawer-field" style={{ flex: 2 }}>
-                    <label>Owner Address</label>
-                    <input placeholder={address || '0x…'} value={verifyOwner} onChange={e => setVerifyOwner(e.target.value)} />
-                  </div>
-                  <div className="drawer-field" style={{ flex: 1 }}>
-                    <label>Workflow ID</label>
-                    <input placeholder="wf-…" value={verifyId} onChange={e => setVerifyId(e.target.value)} />
-                  </div>
-                  <button
-                    disabled={!verifyId || verifying}
-                    onClick={async () => {
-                      const owner = verifyOwner.trim() || address || '';
-                      if (!owner) { setVerifyError('Connect wallet or enter owner address'); return; }
-                      setVerifying(true); setVerifyError(''); setVerifyResult(null);
-                      try {
-                        const [wf, ex] = await Promise.all([
-                          getWorkflow(owner, verifyId.trim(), chainId),
-                          getLatestExecution(owner, verifyId.trim(), chainId),
-                        ]);
-                        setVerifyResult({ manifestHash: wf.manifestHash, storageKey: wf.storageKey, createdAt: wf.createdAt, executionCount: wf.executionCount, execTxHash: ex.executionTxHash, execStorageTx: ex.storageTxHash, execTimestamp: ex.timestamp });
-                      } catch (e: unknown) {
-                        setVerifyError(e instanceof Error ? e.message : 'Lookup failed');
-                      } finally { setVerifying(false); }
-                    }}
-                    style={{ flexShrink: 0, background: 'var(--brand-grad)', border: 0, borderRadius: 6, color: '#07090C', fontWeight: 600, padding: '0 16px', height: 34, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, letterSpacing: '0.10em', textTransform: 'uppercase', cursor: verifyId && !verifying ? 'pointer' : 'not-allowed', opacity: verifyId && !verifying ? 1 : 0.45, transition: 'opacity 120ms' }}
-                  >
-                    {verifying ? 'Checking…' : 'Verify'}
-                  </button>
-                </div>
-                {verifyError && (
-                  <div style={{ fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, color: 'var(--err-500)', letterSpacing: '0.08em' }}>{verifyError}</div>
-                )}
-                {verifyResult ? (
-                  <div className="dp">
-                    <div className="dp-section-head">On-chain Record</div>
-                    <div className="dp-row dp-kv"><span className="dp-k">Manifest Hash</span><span className="dp-v tx">{verifyResult.manifestHash}</span></div>
-                    <div className="dp-row dp-kv"><span className="dp-k">Storage Key</span><span className="dp-v tx">{verifyResult.storageKey}</span></div>
-                    <div className="dp-row dp-kv"><span className="dp-k">Created</span><span className="dp-v">{verifyResult.createdAt ? new Date(verifyResult.createdAt * 1000).toLocaleString() : '—'}</span></div>
-                    <div className="dp-row dp-kv"><span className="dp-k">Executions</span><span className="dp-v">{verifyResult.executionCount}</span></div>
-                    {verifyResult.execTimestamp > 0 && (<>
-                      <div className="dp-row dp-kv"><span className="dp-k">Latest Exec Tx</span><span className="dp-v tx"><a href={`https://explorer.0g.ai/tx/${verifyResult.execTxHash}`} target="_blank" rel="noopener noreferrer">{verifyResult.execTxHash.slice(0, 18)}…</a></span></div>
-                      <div className="dp-row dp-kv"><span className="dp-k">Storage Tx</span><span className="dp-v tx">{verifyResult.execStorageTx}</span></div>
-                      <div className="dp-row dp-kv"><span className="dp-k">Exec Time</span><span className="dp-v">{new Date(verifyResult.execTimestamp * 1000).toLocaleString()}</span></div>
-                    </>)}
-                  </div>
-                ) : (
-                  !verifyError && <div className="drawer-empty">Enter a workflow ID to look up its on-chain record.</div>
-                )}
-              </div>
-            )}
 
             {tab === 'history' && (
               <div style={{ padding: '4px 0' }}>

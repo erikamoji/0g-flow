@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Node, Edge } from 'reactflow';
-import { useAccount, useWalletClient, useChainId, useDisconnect } from 'wagmi';
+import { useAccount, useWalletClient, useChainId, useDisconnect, useSwitchChain } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { uploadPendingAnchors, type PendingAnchor } from '@/lib/storageClient';
 import { Sidebar } from '@/components/Sidebar';
@@ -16,34 +16,8 @@ import { registerWorkflow, recordExecution } from '@/lib/registry';
 import { getNetwork } from '@/lib/networks';
 import { WorkflowTemplate, WORKFLOW_TEMPLATES } from '@/lib/templates';
 
-const OG_CHAINS = [
-  {
-    chainId: '0x40da', // 16602
-    chainName: '0G Galileo Testnet',
-    nativeCurrency: { name: '0G Token', symbol: 'A0G', decimals: 18 },
-    rpcUrls: ['https://evmrpc-testnet.0g.ai'],
-    blockExplorerUrls: ['https://explorer.0g.ai'],
-  },
-  {
-    chainId: '0x4115', // 16661
-    chainName: '0G Aristotle Mainnet',
-    nativeCurrency: { name: '0G Token', symbol: 'A0G', decimals: 18 },
-    rpcUrls: ['https://evmrpc.0g.ai'],
-    blockExplorerUrls: ['https://explorer.0g.ai'],
-  },
-];
-
 export default function Home() {
   const { isConnected } = useAccount();
-
-  // Pre-register 0G chains in MetaMask on app load so chain-switch never fails
-  useEffect(() => {
-    if (typeof window === 'undefined' || !(window as any).ethereum) return;
-    for (const chain of OG_CHAINS) {
-      (window as any).ethereum.request({ method: 'wallet_addEthereumChain', params: [chain] })
-        .catch(() => {});
-    }
-  }, []);
 
   if (!isConnected) {
     return <LandingPage />;
@@ -399,7 +373,7 @@ function LandingPage() {
         <div className="lp-nav-links">
           <a href="#lp-compose">Build</a>
           <a href="#lp-deploy">Run</a>
-          <a href="#lp-anchor">Verify</a>
+          <a href="/verify">Verify</a>
         </div>
         <div className="lp-block-pill">
           <span className="lp-live-dot" />
@@ -619,6 +593,9 @@ function LandingPage() {
                 <span className="lp-eyebrow">03 · Verify</span>
                 <h2 className="lp-h2">Every run is <span className="lp-grad">on the record.</span></h2>
                 <p className="lp-lede">Each execution produces a real transaction hash. Paste it into the 0G explorer — the result, timestamp, and storage root are permanently on-chain.</p>
+                <a href="/verify" className="lp-btn--ghost" style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
+                  Verify a workflow →
+                </a>
               </div>
             </div>
             <div className="lp-receipt lp-reveal">
@@ -734,19 +711,11 @@ function Dashboard() {
   const { disconnect } = useDisconnect();
   const [chainMenuOpen, setChainMenuOpen] = useState(false);
 
-  const switchChain = useCallback(async (targetId: number) => {
-    const eth = (window as any).ethereum;
-    if (!eth) return;
-    try {
-      await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + targetId.toString(16) }] });
-    } catch (e: any) {
-      if (e.code === 4902) {
-        const chain = OG_CHAINS.find(c => parseInt(c.chainId, 16) === targetId);
-        if (chain) await eth.request({ method: 'wallet_addEthereumChain', params: [chain] });
-      }
-    }
+  const { switchChain: wagmiSwitch } = useSwitchChain();
+  const switchChain = useCallback((targetId: number) => {
+    wagmiSwitch({ chainId: targetId });
     setChainMenuOpen(false);
-  }, []);
+  }, [wagmiSwitch]);
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -1004,7 +973,7 @@ function Dashboard() {
                   </button>
                 );
                 return (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.10em', textTransform: 'uppercase', background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderLeft: '2px solid var(--ok-500)', color: 'var(--fg-1)', padding: '4px 8px 4px 10px', borderRadius: 6, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-jetbrains-mono, monospace)', fontSize: 11, fontWeight: 500, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'var(--fg-1)', padding: '4px 2px', flexShrink: 0 }}>
                     <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--ok-500)', boxShadow: '0 0 6px var(--ok-glow)', flexShrink: 0 }} />
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 90 }}>{account.displayName}</span>
                     <button onClick={() => disconnect()} title="Disconnect" style={{ background: 'none', border: 'none', color: 'var(--fg-4)', cursor: 'pointer', padding: 0, lineHeight: 0, borderRadius: 3, flexShrink: 0, marginLeft: 2, transition: 'color 150ms' }}

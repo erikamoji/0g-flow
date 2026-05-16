@@ -25,7 +25,7 @@ export const NETWORKS: Record<number, NetworkConfig> = {
     storageIndexer: 'https://indexer-storage-turbo.0g.ai',
     storageExplorer: 'https://storagescan.0g.ai',
     registryAddress: (process.env.NEXT_PUBLIC_REGISTRY_ADDRESS_16661 ?? '') as `0x${string}`,
-    models: ['zai-org/GLM-5.1-FP8', 'deepseek-v4-pro', '0GM-1.0-35B-A3B', 'qwen/qwen3-vl-30b-a3b-instruct'],
+    models: ['zai-org/GLM-5.1-FP8', 'zai-org/GLM-5-FP8', 'deepseek-v4-pro', 'deepseek/deepseek-chat-v3-0324', 'qwen3.6-plus', 'qwen/qwen3-vl-30b-a3b-instruct', '0GM-1.0-35B-A3B'],
   },
 };
 
