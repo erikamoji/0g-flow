@@ -199,6 +199,8 @@ function LandingPage() {
         .lp-btn--primary:hover { filter: brightness(1.1); }
         .lp-btn--ghost { background: var(--bg-2); color: var(--fg-2); font-family: var(--font-jetbrains-mono, monospace); font-size: 11px; font-weight: 500; letter-spacing: 0.04em; height: 36px; padding: 0 16px; border-radius: 7px; border: 1px solid var(--line-2); cursor: pointer; transition: background 120ms, color 120ms; }
         .lp-btn--ghost:hover { background: var(--bg-3); color: var(--fg-1); }
+        .lp-btn--brand { background: var(--brand-grad); color: #07090C; font-family: var(--font-jetbrains-mono, monospace); font-size: 11px; font-weight: 600; letter-spacing: 0.10em; text-transform: uppercase; height: 34px; padding: 0 20px; border-radius: 7px; border: 0; cursor: pointer; transition: filter 120ms; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .lp-btn--brand:hover { filter: brightness(1.08); }
         /* Hero meta */
         .lp-hero-meta { display: flex; align-items: center; gap: 8px; font-family: var(--font-jetbrains-mono, monospace); font-size: 10px; color: var(--fg-4); letter-spacing: 0.08em; }
         /* HERO TERMINAL */
@@ -597,8 +599,8 @@ function LandingPage() {
               <div className="lp-sect-head" style={{ marginBottom: 0 }}>
                 <span className="lp-eyebrow">03 · Verify</span>
                 <h2 className="lp-h2">Every run is <span className="lp-grad">on the record.</span></h2>
-                <p className="lp-lede">Each execution produces a real transaction hash. Paste it into the 0G explorer — the result, timestamp, and storage root are permanently on-chain.</p>
-                <a href="/verify" className="lp-btn--ghost" style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
+                <p className="lp-lede">Each execution leaves a permanent record. Enter an owner address and workflow ID — the app reads manifest hash, storage root, and execution count directly from the registry contract.</p>
+                <a href="/verify" className="lp-btn--brand" style={{ marginTop: 16 }}>
                   Verify a workflow →
                 </a>
               </div>
