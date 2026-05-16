@@ -34,6 +34,7 @@ export function compileManifest(
       baseParams.source = d.source || 'manual';
     } else if (node.type === 'ai_compute') {
       baseParams.model = d.model || 'zai-org/GLM-5-FP8';
+      baseParams.provider_address = d.provider_address || '';
       baseParams.instruction = d.instruction || 'Analyze the input data and provide a structured summary.';
       baseParams.sealed = d.sealed !== false;
 
