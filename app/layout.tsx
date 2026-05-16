@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter_Tight, JetBrains_Mono, Fraunces } from "next/font/google";
 import { Providers } from "@/components/Providers";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const interTight = Inter_Tight({
@@ -40,6 +41,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-bg-0 text-fg-1">
         <Providers>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
