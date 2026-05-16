@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Node, Edge } from 'reactflow';
 import { useAccount, useWalletClient, useChainId, useDisconnect, useSwitchChain } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { uploadPendingAnchors, type PendingAnchor } from '@/lib/storageClient';
+import type { PendingAnchor, AnchorResult } from '@/lib/storageClient';
 import { Sidebar } from '@/components/Sidebar';
 import { Canvas } from '@/components/Canvas';
 import { ManifestModal } from '@/components/ManifestModal';
@@ -843,18 +843,23 @@ function Dashboard() {
 
       const pendingAnchors: PendingAnchor[] = result.pendingAnchors || [];
       if (pendingAnchors.length > 0) {
-        if (!walletClient) {
-          throw new Error('Wallet not connected — cannot sign storage uploads');
-        }
-
         appendLogs([{
           id: `log_storage_start_${Date.now()}`,
           timestamp: new Date().toISOString(),
           level: 'info' as const,
-          message: `Signing ${pendingAnchors.length} storage upload(s) with your wallet…`,
+          message: `Uploading ${pendingAnchors.length} anchor(s) to 0G Storage…`,
         }]);
 
-        const anchorResults = await uploadPendingAnchors(pendingAnchors, walletClient, chainId);
+        const anchorResp = await fetch('/api/anchor', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pendingAnchors, chainId }),
+        });
+        if (!anchorResp.ok) {
+          const { error } = await anchorResp.json();
+          throw new Error(error || 'Storage upload failed');
+        }
+        const anchorResults: AnchorResult[] = await anchorResp.json();
 
         appendLogs(anchorResults.map((r) => ({
           id: `log_anchor_${r.nodeId}_${Date.now()}`,
