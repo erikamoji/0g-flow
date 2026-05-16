@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter_Tight, JetBrains_Mono, Fraunces } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/Providers";
 import "./globals.css";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-bg-0 text-fg-1">
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
