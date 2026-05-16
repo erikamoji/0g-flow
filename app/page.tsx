@@ -374,6 +374,7 @@ function LandingPage() {
           <a href="#lp-compose">Build</a>
           <a href="#lp-deploy">Run</a>
           <a href="/verify">Verify</a>
+          <a href="https://0g-flow-deck.netlify.app" target="_blank" rel="noopener noreferrer">Deck</a>
         </div>
         <div className="lp-block-pill">
           <span className="lp-live-dot" />
