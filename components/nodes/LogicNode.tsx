@@ -5,12 +5,24 @@ import { Handle, Position, useReactFlow } from 'reactflow';
 import { useChainId } from 'wagmi';
 import { getNetwork } from '@/lib/networks';
 
+type ProviderEntry = {
+  provider: string;
+  model: string;
+  url: string;
+  uptime: number | null;
+  avgResponseTime: number | null;
+  teeAcknowledged: boolean;
+};
+
 export function LogicNode({ id, data }: { id: string; data: any }) {
   const { setNodes, setEdges } = useReactFlow();
   const chainId = useChainId();
-  const models = getNetwork(chainId).models;
+  const fallbackModels = getNetwork(chainId).models;
+
+  const [providers, setProviders] = useState<ProviderEntry[]>([]);
+  const [loadingProviders, setLoadingProviders] = useState(false);
+
   const name = data.name || '0G Compute · Sealed';
-  const model = data.model || models[0];
   const sealed = data.sealed !== false;
   const instruction = data.instruction || '';
 
@@ -22,10 +34,23 @@ export function LogicNode({ id, data }: { id: string; data: any }) {
   }, [id, setNodes]);
 
   useEffect(() => {
-    if (!models.includes(data.model)) {
-      update({ model: models[0] });
-    }
+    setLoadingProviders(true);
+    fetch(`/api/providers?chainId=${chainId}`)
+      .then(r => r.json())
+      .then((list: ProviderEntry[]) => {
+        if (!Array.isArray(list) || list.length === 0) return;
+        setProviders(list);
+        const current = list.find(p => p.provider === data.provider_address);
+        if (!current) {
+          update({ model: list[0].model, provider_address: list[0].provider });
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingProviders(false));
   }, [chainId]);
+
+  const selectedProvider = providers.find(p => p.provider === data.provider_address);
+  const model = selectedProvider?.model || data.model || fallbackModels[0] || '';
 
   return (
     <div className={`node node-logic ${data.selected ? 'selected' : ''}`} style={{ width: 260 }}>
@@ -66,19 +91,36 @@ export function LogicNode({ id, data }: { id: string; data: any }) {
       <div className="node-body">
         <div className="node-row">
           <span className="l">Model</span>
-          <select
-            className="node-edit-select"
-            value={model}
-            onChange={e => update({ model: e.target.value })}
-            onClick={e => e.stopPropagation()}
-            style={{ color: 'var(--logic-300)' }}
-          >
-            {models.map(m => <option key={m} value={m}>{m.split('/').pop()}</option>)}
-          </select>
+          {loadingProviders ? (
+            <span className="v" style={{ color: 'var(--fg-4)' }}>loading…</span>
+          ) : providers.length > 0 ? (
+            <select
+              className="node-edit-select"
+              value={data.provider_address || ''}
+              onChange={e => {
+                const p = providers.find(p => p.provider === e.target.value);
+                if (p) update({ model: p.model, provider_address: p.provider });
+              }}
+              onClick={e => e.stopPropagation()}
+              style={{ color: 'var(--logic-300)' }}
+            >
+              {providers.map(p => (
+                <option key={p.provider} value={p.provider}>
+                  {p.model.split('/').pop()}{p.uptime != null ? ` · ${p.uptime.toFixed(0)}%` : ''}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span className="v" style={{ color: 'var(--err-500)' }}>no providers</span>
+          )}
         </div>
         <div className="node-row">
           <span className="l">Provider</span>
-          <span className="v">0g-compute · {chainId === 16661 ? 'mainnet' : 'galileo'}</span>
+          <span className="v" style={{ fontFamily: 'monospace', fontSize: 10 }}>
+            {selectedProvider
+              ? `${selectedProvider.provider.slice(0, 6)}…${selectedProvider.provider.slice(-4)}`
+              : `0g · ${chainId === 16661 ? 'mainnet' : 'galileo'}`}
+          </span>
         </div>
         <div
           className="toggle-row"

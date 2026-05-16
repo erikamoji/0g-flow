@@ -1,5 +1,7 @@
 import OpenAI from 'openai';
 import axios from 'axios';
+import { ethers } from 'ethers';
+import { createZGComputeNetworkBroker } from '@0gfoundation/0g-compute-ts-sdk';
 import { Manifest } from './manifestCompiler';
 import { ExecutionLogger } from './executionLogger';
 import { resolveParametersObject } from './variableResolver';
@@ -89,32 +91,40 @@ class ManifestExecutor {
 
     try {
       const { resolved: resolvedParams } = resolveParametersObject(node.params, this.context);
-      const { model, instruction, data_source, sealed } = resolvedParams;
+      const { model, instruction, data_source, sealed, provider_address } = resolvedParams;
       const resolvedInput = typeof data_source === 'string' ? JSON.parse(data_source) : data_source;
 
-      const endpoint = `${getNetwork(this.manifest.chain_id).routerApi}/chat/completions`;
-      const apiKey = this.manifest.chain_id === 16661
-        ? process.env.OG_ROUTER_API_KEY_16661
-        : process.env.OG_ROUTER_API_KEY_16602;
+      if (!provider_address) throw new Error('No provider selected — open the node and pick a provider from the dropdown');
+      if (!process.env.PRIVATE_KEY) throw new Error('PRIVATE_KEY not set in environment');
 
-      this.logger.log('debug', `Calling 0G Compute: ${model}${sealed ? ' · verify_tee: true' : ''} · endpoint=${endpoint} · hasKey=${!!apiKey}`, { input: resolvedInput });
+      const network = getNetwork(this.manifest.chain_id);
+      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, new ethers.JsonRpcProvider(network.rpc));
+      const broker = await createZGComputeNetworkBroker(wallet);
+
+      const { endpoint } = await broker.inference.getServiceMetadata(provider_address);
+      const brokerHeaders = await broker.inference.getRequestHeaders(provider_address, JSON.stringify(resolvedInput));
+
+      this.logger.log('debug', `Calling 0G Compute via broker: ${model}${sealed ? ' · verify_tee: true' : ''} · provider=${provider_address.slice(0, 10)}…`, { input: resolvedInput });
 
       const ogClient = new OpenAI({
-        baseURL: endpoint.replace('/chat/completions', ''),
-        apiKey: apiKey || 'no-key',
+        baseURL: endpoint,
+        apiKey: '',
         timeout: 30000,
       });
 
-      const response = await ogClient.chat.completions.create({
-        model,
-        messages: [
-          { role: 'system', content: instruction },
-          { role: 'user', content: JSON.stringify(resolvedInput) },
-        ],
-        temperature: 0.7,
-        max_tokens: 1024,
-        ...((sealed ? { verify_tee: true } : {}) as object),
-      });
+      const response = await ogClient.chat.completions.create(
+        {
+          model,
+          messages: [
+            { role: 'system', content: instruction },
+            { role: 'user', content: JSON.stringify(resolvedInput) },
+          ],
+          temperature: 0.7,
+          max_tokens: 1024,
+          ...((sealed ? { verify_tee: true } : {}) as object),
+        },
+        { headers: { ...brokerHeaders } }
+      );
 
       const output = response.choices?.[0]?.message?.content || '';
       const trace = (response as any).x_0g_trace || {};
