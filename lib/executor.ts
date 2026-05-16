@@ -108,7 +108,7 @@ class ManifestExecutor {
 
       const ogClient = new OpenAI({
         baseURL: endpoint,
-        apiKey: '',
+        apiKey: 'x', // SDK v6 rejects empty string; real auth is via brokerHeaders
         timeout: 30000,
       });
 
